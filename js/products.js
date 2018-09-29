@@ -178,7 +178,6 @@ var getRating = function (element, good) {
 function renderCard(product) {
   var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
 
-  cardTemplate.classList.add(getAmountClass(product.amount));
   getAmountClass(cardTemplate, product.amount);
 
   var cardElement = cardTemplate.cloneNode(true);
