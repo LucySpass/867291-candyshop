@@ -52,7 +52,7 @@ var NUTRITION_FACTS = {
     'ксилит',
     'карбамид',
     'вилларибо',
-    'виллабаджо',
+    'виллабаджо'
   ]
 };
 
@@ -84,7 +84,7 @@ var NAMES = [
   'Бесконечный взрыв',
   'Невинные винные',
   'Бельгийское пенное',
-  'Острый язычок',
+  'Острый язычок'
 ];
 
 var PICTURES = [
@@ -115,7 +115,7 @@ var PICTURES = [
   'soda-cob.jpg',
   'soda-garlic.jpg',
   'soda-peanut-grapes.jpg',
-  'soda-russian.jpg',
+  'soda-russian.jpg'
 ];
 
 
@@ -150,7 +150,7 @@ function generateProduct() {
     weight: getRandomNumberInRange(WEIGHT),
     rating: {
       value: getRandomNumberInRange(RATING.VALUES),
-      number: getRandomNumberInRange(RATING.RATINGS),
+      number: getRandomNumberInRange(RATING.RATINGS)
     },
     nutritionFacts: {
       sugar: getRandomNumberInRange(NUTRITION_FACTS.SUGAR),
