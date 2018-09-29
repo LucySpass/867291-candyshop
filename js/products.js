@@ -160,8 +160,11 @@ function generateProduct() {
   };
 }
 
-function getAmountClass(amount) {
-  return amount === 0 ? 'card--soon' : (amount > 0 && amount <= AMOUNT_MIDDLE) ? 'card--little' : 'card--in-stock';
+function getAmountClass(element, amount) {
+  if (amount < 5) {
+    element.classList.remove('card--in-stock');
+    element.classList.add(amount === 0 ? 'card--soon' : 'card--little');
+  }
 }
 
 var getRating = function (element, good) {
@@ -175,8 +178,8 @@ var getRating = function (element, good) {
 function renderCard(product) {
   var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
 
-  cardTemplate.classList.remove('card--in-stock');
   cardTemplate.classList.add(getAmountClass(product.amount));
+  getAmountClass(cardTemplate, product.amount);
 
   var cardElement = cardTemplate.cloneNode(true);
 
