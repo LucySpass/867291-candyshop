@@ -161,7 +161,7 @@ function generateProduct() {
 }
 
 function getAmountClass(element, amount) {
-  if (amount < 5) {
+  if (amount < AMOUNT_MIDDLE) {
     element.classList.remove('card--in-stock');
     element.classList.add(amount === 0 ? 'card--soon' : 'card--little');
   }
