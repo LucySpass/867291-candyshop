@@ -1,7 +1,6 @@
 'use strict';
 
 var PRODUCTS_AMOUNT = 26;
-var CART_PRODUCTS_AMOUNT = 3;
 var RATING_NUMBER = 5;
 var AMOUNT_MIDDLE = 5;
 var SRC = 'img/cards/';
@@ -136,111 +135,215 @@ function deleteUsedArrayValue(array, value) {
   return value;
 }
 
-function getRandomNumberInRange(obj) {
-  return Math.floor(Math.random() * (obj.max - obj.min + 1)) + obj.min;
-}
+var cartModule = (function () {
+  var cartProducts = [];
+  var cartFragment;
+  var goodCardsElement;
+  var cartProduct;
+  var isInit = true;
+  var goodCartEmpty;
 
-function generateProduct() {
+  function init() {
+    cartProducts = [];
+    cartFragment = document.createDocumentFragment();
+    goodCardsElement = document.querySelector('.goods__cards');
+    goodCartEmpty = document.querySelector('#cards-empty').content.querySelector('.goods__card-empty');
+  }
+
+  function contains(array, item) {
+    for (var i = 0; i < array.length; i++) {
+      if (array[i].name === item.name) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  function removeCart() {
+    while (goodCardsElement.firstChild) {
+      goodCardsElement.removeChild(goodCardsElement.firstChild);
+    }
+  }
+
+  function createCartCard(product) {
+    var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
+    var cardOrderElement = cartCardTemplate.cloneNode(true);
+    var image = cardOrderElement.querySelector('.card-order__img');
+
+    cardOrderElement.querySelector('.card-order__title').textContent = product.name;
+
+    image.src = product.picture;
+    image.alt = product.name;
+
+    cardOrderElement.querySelector('.card-order__price').textContent = product.price + ' ₽';
+
+    return cardOrderElement;
+  }
+
+  function renderCartCards() {
+    removeCart();
+
+    if (cartProducts.length === 0) {
+      goodCardsElement.classList.add('goods__cards--empty');
+      goodCartEmpty.classList.remove('visually-hidden');
+      return;
+    }
+
+    for (var i = 0; i < cartProducts; i++) {
+      cartFragment.appendChild(createCartCard(cartProducts[i]));
+    }
+    goodCardsElement.appendChild(cartFragment);
+    goodCardsElement.classList.remove('goods__cards--empty');
+    goodCartEmpty.classList.add('visually-hidden');
+  }
+
+  function addToCard(product) {
+    cartProduct = null;
+    if (product.amount < 1) {
+      return;
+    }
+    var index = contains(cartProducts, product);
+    if (index > -1) {
+      cartProducts[index].cartAmount++;
+    } else {
+      cartProduct = Object.assign({}, product);
+      cartProduct.cartAmount = 1;
+      cartProducts.push(cartProduct);
+      renderCartCards();
+    }
+  }
+
   return {
-    name: getValueInArray(NAMES),
-    picture: SRC + getValueInArray(PICTURES),
-    amount: getRandomNumberInRange(AMOUNT),
-    price: getRandomNumberInRange(PRICE),
-    weight: getRandomNumberInRange(WEIGHT),
-    rating: {
-      value: getRandomNumberInRange(RATING.VALUES),
-      number: getRandomNumberInRange(RATING.RATINGS)
-    },
-    nutritionFacts: {
-      sugar: getRandomNumberInRange(NUTRITION_FACTS.SUGAR),
-      energy: getRandomNumberInRange(NUTRITION_FACTS.ENERGY),
-      contents: getRandomArrayValue(NUTRITION_FACTS.CONTENTS)
+    addToCard: function (product) {
+      if (isInit) {
+        init();
+      }
+      addToCard(product);
     }
   };
-}
+})();
 
-function getAmountClass(element, amount) {
-  if (amount < AMOUNT_MIDDLE) {
-    element.classList.remove('card--in-stock');
-    element.classList.add(amount === 0 ? 'card--soon' : 'card--little');
-  }
-}
-
-var getRating = function (element, good) {
-  var ratingElem = element.querySelector('.stars__rating');
-
-  if (good.rating.value !== RATING_NUMBER) {
-    ratingElem.classList.remove('stars__rating--five');
-    ratingElem.classList.add('stars__rating--' + VALUES[good.rating.value]);
-  }
-};
-
-function renderCard(product) {
-  var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
-  var cardElement = cardTemplate.cloneNode(true);
-  var picture = cardElement.querySelector('.card__img');
-  var price = cardElement.querySelector('.card__price');
-
-  getAmountClass(cardTemplate, product.amount);
-
-  cardElement.querySelector('.card__title').textContent = product.name;
-
-  picture.src = product.picture;
-  picture.alt = product.name;
-
-  price.childNodes[0].textContent = product.price + ' ';
-  price.childNodes[2].textContent = '/ ' + product.weight + ' Г';
-
-  getRating(cardElement, product);
-
-  cardElement.querySelector('.star__count').textContent = product.rating.number;
-
-  cardElement.querySelector('.card__characteristic').textContent =
-    (!product.nutritionFacts.sugar ? 'Без сахара' : 'Содержит сахар') +
-    product.nutritionFacts.energy + ' ккал';
-
-  cardElement.querySelector('.card__composition-list').textContent = product.nutritionFacts.contents;
-  return cardElement;
-}
-
-function renderCartCard(product) {
-  var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
-  var cardOrderElement = cartCardTemplate.cloneNode(true);
-  var image = cardOrderElement.querySelector('.card-order__img');
-
-  cardOrderElement.querySelector('.card-order__title').textContent = product.name;
-
-  image.src = product.picture;
-  image.alt = product.name;
-
-  cardOrderElement.querySelector('.card-order__price').textContent = product.price + ' ₽';
-
-  return cardOrderElement;
-}
-
-
-function main() {
-  var fragment = document.createDocumentFragment();
-  var cartFragment = document.createDocumentFragment();
-  var goodCardsElement = document.querySelector('.goods__cards');
-  var products = [];
-
-  for (var i = 0; i < PRODUCTS_AMOUNT; i++) {
-    products.push(generateProduct());
-    fragment.appendChild(renderCard(products[i]));
-  }
-  document.querySelector('.catalog__cards').appendChild(fragment);
-
-  for (var j = 0; j < CART_PRODUCTS_AMOUNT; j++) {
-    cartFragment.appendChild(renderCartCard(getValueInArray(products)));
+var productModule = (function () {
+  function getRandomNumberInRange(obj) {
+    return Math.floor(Math.random() * (obj.max - obj.min + 1)) + obj.min;
   }
 
-  goodCardsElement.appendChild(cartFragment);
-  goodCardsElement.classList.remove('goods__cards--empty');
+  function getAmountClass(element, amount) {
+    if (amount < AMOUNT_MIDDLE) {
+      element.classList.remove('card--in-stock');
+      element.classList.add(amount === 0 ? 'card--soon' : 'card--little');
+    }
+  }
 
-  document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
-  document.querySelector('.catalog__load').classList.add('visually-hidden');
-  document.querySelector('.goods__card-empty').classList.add('visually-hidden');
-}
+  var getRating = function (element, good) {
+    var ratingElem = element.querySelector('.stars__rating');
 
-main();
+    if (good.rating.value !== RATING_NUMBER) {
+      ratingElem.classList.remove('stars__rating--five');
+      ratingElem.classList.add('stars__rating--' + VALUES[good.rating.value]);
+    }
+  };
+
+  function generateProduct() {
+    return {
+      name: getValueInArray(NAMES),
+      picture: SRC + getValueInArray(PICTURES),
+      amount: getRandomNumberInRange(AMOUNT),
+      price: getRandomNumberInRange(PRICE),
+      weight: getRandomNumberInRange(WEIGHT),
+      rating: {
+        value: getRandomNumberInRange(RATING.VALUES),
+        number: getRandomNumberInRange(RATING.RATINGS)
+      },
+      nutritionFacts: {
+        sugar: getRandomNumberInRange(NUTRITION_FACTS.SUGAR),
+        energy: getRandomNumberInRange(NUTRITION_FACTS.ENERGY),
+        contents: getRandomArrayValue(NUTRITION_FACTS.CONTENTS)
+      }
+    };
+  }
+
+  function renderCard(product) {
+    var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
+    var cardElement = cardTemplate.cloneNode(true);
+    var picture = cardElement.querySelector('.card__img');
+    var price = cardElement.querySelector('.card__price');
+    var favoriteBtn = cardElement.querySelector('.card__btn-favorite');
+    var addBtn = cardElement.querySelector('.card__btn');
+
+    getAmountClass(cardTemplate, product.amount);
+
+    cardElement.querySelector('.card__title').textContent = product.name;
+
+    picture.src = product.picture;
+    picture.alt = product.name;
+
+    price.childNodes[0].textContent = product.price + ' ';
+    price.childNodes[2].textContent = '/ ' + product.weight + ' Г';
+
+    getRating(cardElement, product);
+
+    cardElement.querySelector('.star__count').textContent = product.rating.number;
+
+    cardElement.querySelector('.card__characteristic').textContent =
+      (!product.nutritionFacts.sugar ? 'Без сахара' : 'Содержит сахар') +
+      product.nutritionFacts.energy + ' ккал';
+
+    cardElement.querySelector('.card__composition-list').textContent = product.nutritionFacts.contents;
+
+    favoriteBtn.addEventListener('click', function () {
+      return favoriteBtn.classList.contains('card__btn-favorite--selected') ?
+        favoriteBtn.classList.remove('card__btn-favorite--selected') :
+        favoriteBtn.classList.add('card__btn-favorite--selected');
+    });
+    addBtn.addEventListener('click', function () {
+      cartModule.addToCard(product);
+    });
+
+    return cardElement;
+  }
+
+  return {
+    generateProduct: function () {
+      return generateProduct();
+    },
+    renderCard: function (product) {
+      return renderCard(product);
+    }
+  };
+})();
+
+
+var initModule = (function () {
+  var fragment;
+  var products;
+
+  function createProducts() {
+    for (var i = 0; i < PRODUCTS_AMOUNT; i++) {
+      products.push(productModule.generateProduct());
+      fragment.appendChild(productModule.renderCard(products[i]));
+    }
+    document.querySelector('.catalog__cards').appendChild(fragment);
+  }
+
+
+  function main() {
+    fragment = document.createDocumentFragment();
+
+    products = [];
+    createProducts();
+  }
+
+
+  return {
+    main: function () {
+      main();
+
+      document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
+      document.querySelector('.catalog__load').classList.add('visually-hidden');
+    }
+  };
+})();
+
+
+initModule.main();
