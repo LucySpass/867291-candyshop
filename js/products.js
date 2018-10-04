@@ -137,18 +137,9 @@ function deleteUsedArrayValue(array, value) {
 
 var cartModule = (function () {
   var cartProducts = [];
-  var cartFragment;
-  var goodCardsElement;
-  var cartProduct;
-  var isInit = true;
-  var goodCartEmpty;
-
-  function init() {
-    cartProducts = [];
-    cartFragment = document.createDocumentFragment();
-    goodCardsElement = document.querySelector('.goods__cards');
-    goodCartEmpty = document.querySelector('#cards-empty').content.querySelector('.goods__card-empty');
-  }
+  var cartFragment = document.createDocumentFragment();
+  var goodCardsElement = document.querySelector('.goods__cards');
+  var goodCartEmpty = document.querySelector('#cards-empty').content.querySelector('.goods__card-empty');
 
   function contains(array, item) {
     for (var i = 0; i < array.length; i++) {
@@ -159,15 +150,13 @@ var cartModule = (function () {
     return -1;
   }
 
-  function removeCart() {
-    while (goodCardsElement.firstChild) {
-      goodCardsElement.removeChild(goodCardsElement.firstChild);
+  function removeCart(element) {
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
     }
   }
 
-  function createCartCard(product) {
-    var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
-    var cardOrderElement = cartCardTemplate.cloneNode(true);
+  function createCartCard(product, cardOrderElement) {
     var image = cardOrderElement.querySelector('.card-order__img');
 
     cardOrderElement.querySelector('.card-order__title').textContent = product.name;
@@ -181,24 +170,31 @@ var cartModule = (function () {
   }
 
   function renderCartCards() {
-    removeCart();
-
+    removeCart(goodCardsElement);
     if (cartProducts.length === 0) {
       goodCardsElement.classList.add('goods__cards--empty');
       goodCartEmpty.classList.remove('visually-hidden');
       return;
     }
 
-    for (var i = 0; i < cartProducts; i++) {
-      cartFragment.appendChild(createCartCard(cartProducts[i]));
+    for (var i = 0; i < cartProducts.length; i++) {
+      var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
+      var cardOrderElement = cartCardTemplate.cloneNode(true);
+      var cartProductAmountEl = cardOrderElement.querySelector('.card-order__count');
+
+      var cartCard = createCartCard(cartProducts[i], cardOrderElement);
+      cartProductAmountEl.value = cartProducts[i].cartAmount;
+      cartProductAmountEl.name = cartProducts[i].name;
+
+      cartFragment.appendChild(cartCard);
     }
+
     goodCardsElement.appendChild(cartFragment);
     goodCardsElement.classList.remove('goods__cards--empty');
     goodCartEmpty.classList.add('visually-hidden');
   }
 
   function addToCard(product) {
-    cartProduct = null;
     if (product.amount < 1) {
       return;
     }
@@ -206,18 +202,15 @@ var cartModule = (function () {
     if (index > -1) {
       cartProducts[index].cartAmount++;
     } else {
-      cartProduct = Object.assign({}, product);
+      var cartProduct = Object.assign({}, product);
       cartProduct.cartAmount = 1;
       cartProducts.push(cartProduct);
-      renderCartCards();
     }
+    renderCartCards();
   }
 
   return {
     addToCard: function (product) {
-      if (isInit) {
-        init();
-      }
       addToCard(product);
     }
   };
