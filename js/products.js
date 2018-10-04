@@ -1,126 +1,5 @@
 'use strict';
 
-var PRODUCTS_AMOUNT = 26;
-var RATING_NUMBER = 5;
-var AMOUNT_MIDDLE = 5;
-var SRC = 'img/cards/';
-
-var AMOUNT = {
-  min: 0, max: 20
-};
-
-var PRICE = {
-  min: 100, max: 1500
-};
-
-var WEIGHT = {
-  min: 30, max: 300
-};
-
-var RATING = {
-  VALUES: {
-    min: 1, max: 5
-  },
-  RATINGS: {
-    min: 10, max: 900
-  }
-};
-
-var NUTRITION_FACTS = {
-  SUGAR: {
-    min: 0, max: 1
-  },
-  ENERGY: {
-    min: 70, max: 500
-  },
-  CONTENTS: [
-    'молоко',
-    'сливки',
-    'вода',
-    'пищевой краситель',
-    'патока',
-    'ароматизатор бекона',
-    'ароматизатор свинца',
-    'ароматизатор дуба, идентичный натуральному',
-    'ароматизатор картофеля',
-    'лимонная кислота',
-    'лимонная кислота',
-    'эмульгатор',
-    'консервант: сорбат калия',
-    'посолочная смесь: соль, нитрит натрия',
-    'ксилит',
-    'карбамид',
-    'вилларибо',
-    'виллабаджо'
-  ]
-};
-
-var NAMES = [
-  'Чесночные сливки',
-  'Огуречный педант',
-  'Молочная хрюша',
-  'Грибной шейк',
-  'Баклажановое безумие',
-  'Паприколу итальяно',
-  'Нинзя-удар васаби',
-  'Хитрый баклажан',
-  'Горчичный вызов',
-  'Кедровая липучка',
-  'Корманный портвейн',
-  'Чилийский задира',
-  'Беконовый взрыв',
-  'Арахис vs виноград',
-  'Сельдерейная душа',
-  'Початок в бутылке',
-  'Чернющий мистер чеснок',
-  'Раша федераша',
-  'Кислая мина',
-  'Кукурузное утро',
-  'Икорный фуршет',
-  'Новогоднее настроение',
-  'С пивком потянет',
-  'Мисс креветка',
-  'Бесконечный взрыв',
-  'Невинные винные',
-  'Бельгийское пенное',
-  'Острый язычок'
-];
-
-var PICTURES = [
-  'gum-cedar.jpg',
-  'gum-chile.jpg',
-  'gum-eggplant.jpg',
-  'gum-mustard.jpg',
-  'gum-portwine.jpg',
-  'gum-wasabi.jpg',
-  'ice-eggplant.jpg',
-  'ice-cucumber.jpg',
-  'ice-garlic.jpg',
-  'ice-italian.jpg',
-  'ice-mushroom.jpg',
-  'ice-pig.jpg',
-  'marmalade-beer.jpg',
-  'marmalade-caviar.jpg',
-  'marmalade-corn.jpg',
-  'marmalade-new-year.jpg',
-  'marmalade-sour.jpg',
-  'marshmallow-bacon.jpg',
-  'marshmallow-beer.jpg',
-  'marshmallow-shrimp.jpg',
-  'marshmallow-spicy.jpg',
-  'marshmallow-wine.jpg',
-  'soda-bacon.jpg',
-  'soda-celery.jpg',
-  'soda-cob.jpg',
-  'soda-garlic.jpg',
-  'soda-peanut-grapes.jpg',
-  'soda-russian.jpg'
-];
-
-var VALUES = [
-  'one', 'two', 'three', 'four', 'five'
-];
-
 function getValueInArray(array) {
   return deleteUsedArrayValue(array, getRandomArrayValue(array));
 }
@@ -226,6 +105,126 @@ var cartModule = (function () {
 })();
 
 var productModule = (function () {
+  var RATING_NUMBER = 5;
+  var AMOUNT_MIDDLE = 5;
+  var SRC = 'img/cards/';
+
+  var VALUES = [
+    'one', 'two', 'three', 'four', 'five'
+  ];
+
+  var AMOUNT = {
+    min: 0, max: 20
+  };
+
+  var PRICE = {
+    min: 100, max: 1500
+  };
+
+  var WEIGHT = {
+    min: 30, max: 300
+  };
+
+  var RATING = {
+    VALUES: {
+      min: 1, max: 5
+    },
+    RATINGS: {
+      min: 10, max: 900
+    }
+  };
+
+  var NUTRITION_FACTS = {
+    SUGAR: {
+      min: 0, max: 1
+    },
+    ENERGY: {
+      min: 70, max: 500
+    },
+    CONTENTS: [
+      'молоко',
+      'сливки',
+      'вода',
+      'пищевой краситель',
+      'патока',
+      'ароматизатор бекона',
+      'ароматизатор свинца',
+      'ароматизатор дуба, идентичный натуральному',
+      'ароматизатор картофеля',
+      'лимонная кислота',
+      'лимонная кислота',
+      'эмульгатор',
+      'консервант: сорбат калия',
+      'посолочная смесь: соль, нитрит натрия',
+      'ксилит',
+      'карбамид',
+      'вилларибо',
+      'виллабаджо'
+    ]
+  };
+
+  var NAMES = [
+    'Чесночные сливки',
+    'Огуречный педант',
+    'Молочная хрюша',
+    'Грибной шейк',
+    'Баклажановое безумие',
+    'Паприколу итальяно',
+    'Нинзя-удар васаби',
+    'Хитрый баклажан',
+    'Горчичный вызов',
+    'Кедровая липучка',
+    'Корманный портвейн',
+    'Чилийский задира',
+    'Беконовый взрыв',
+    'Арахис vs виноград',
+    'Сельдерейная душа',
+    'Початок в бутылке',
+    'Чернющий мистер чеснок',
+    'Раша федераша',
+    'Кислая мина',
+    'Кукурузное утро',
+    'Икорный фуршет',
+    'Новогоднее настроение',
+    'С пивком потянет',
+    'Мисс креветка',
+    'Бесконечный взрыв',
+    'Невинные винные',
+    'Бельгийское пенное',
+    'Острый язычок'
+  ];
+
+  var PICTURES = [
+    'gum-cedar.jpg',
+    'gum-chile.jpg',
+    'gum-eggplant.jpg',
+    'gum-mustard.jpg',
+    'gum-portwine.jpg',
+    'gum-wasabi.jpg',
+    'ice-eggplant.jpg',
+    'ice-cucumber.jpg',
+    'ice-garlic.jpg',
+    'ice-italian.jpg',
+    'ice-mushroom.jpg',
+    'ice-pig.jpg',
+    'marmalade-beer.jpg',
+    'marmalade-caviar.jpg',
+    'marmalade-corn.jpg',
+    'marmalade-new-year.jpg',
+    'marmalade-sour.jpg',
+    'marshmallow-bacon.jpg',
+    'marshmallow-beer.jpg',
+    'marshmallow-shrimp.jpg',
+    'marshmallow-spicy.jpg',
+    'marshmallow-wine.jpg',
+    'soda-bacon.jpg',
+    'soda-celery.jpg',
+    'soda-cob.jpg',
+    'soda-garlic.jpg',
+    'soda-peanut-grapes.jpg',
+    'soda-russian.jpg'
+  ];
+
   function getRandomNumberInRange(obj) {
     return Math.floor(Math.random() * (obj.max - obj.min + 1)) + obj.min;
   }
@@ -317,8 +316,12 @@ var productModule = (function () {
 
 var checkoutModule = (function () {
   var deliverRadio = document.querySelector('.deliver__toggle');
+
   var pickupForm = document.querySelector('.deliver__store');
+  var deliverStoreId = 'deliver__store';
+
   var courierForm = document.querySelector('.deliver__courier');
+  var courierStoreId = 'deliver__courier';
 
   function hide(element) {
     element.classList.add('visually-hidden');
@@ -333,19 +336,19 @@ var checkoutModule = (function () {
       return;
     }
 
-    if (event.target.id === 'deliver__store') {
+    if (event.target.id === deliverStoreId) {
       show(pickupForm);
       hide(courierForm);
     }
 
-    if (event.target.id === 'deliver__courier') {
+    if (event.target.id === courierStoreId) {
       show(courierForm);
       hide(pickupForm);
     }
   }
 
   return {
-    radioToogle: function () {
+    radioAddEventListener: function () {
       deliverRadio.addEventListener('click', radioToogle, false);
     }
   };
@@ -366,7 +369,7 @@ var filterModule = (function () {
   }
 
   return {
-    changePriceRange: function () {
+    listenToPriceRadio: function () {
       rangeBtnLeft.addEventListener('mouseup', changePriceRange);
       rangeBtnRight.addEventListener('mouseup', changePriceRange);
     }
@@ -374,7 +377,11 @@ var filterModule = (function () {
 })();
 
 var initModule = (function () {
+  var PRODUCTS_AMOUNT = 26;
+
   var fragment = document.createDocumentFragment();
+  var catalogCardsElement = document.querySelector('.catalog__cards');
+  var catalogLoadElement = document.querySelector('.catalog__load');
   var products = [];
 
   function createProducts() {
@@ -382,20 +389,16 @@ var initModule = (function () {
       products.push(productModule.generateProduct());
       fragment.appendChild(productModule.renderCard(products[i]));
     }
-    document.querySelector('.catalog__cards').appendChild(fragment);
-  }
-
-  function main() {
-    createProducts();
+    catalogCardsElement.appendChild(fragment);
   }
 
   return {
     main: function () {
-      main();
-      document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
-      document.querySelector('.catalog__load').classList.add('visually-hidden');
-      checkoutModule.radioToogle();
-      filterModule.changePriceRange();
+      createProducts();
+      catalogCardsElement.classList.remove('catalog__cards--load');
+      catalogLoadElement.classList.add('visually-hidden');
+      checkoutModule.radioAddEventListener();
+      filterModule.listenToPriceRadio();
     }
   };
 })();
