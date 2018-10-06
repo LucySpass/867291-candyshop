@@ -23,6 +23,7 @@ var cartModule = (function () {
   var productCartEmpty = document.querySelector('#cards-empty').content.querySelector('.goods__card-empty');
   var cartLabel = document.querySelector('.main-header__basket');
   var deliverRadio = document.querySelector('.deliver__toggle');
+  var cardNumberElement = document.querySelector('#payment__card-number');
 
   var pickupForm = document.querySelector('.deliver__store');
   var deliverStoreId = 'deliver__store';
@@ -137,6 +138,24 @@ var cartModule = (function () {
     }
   }
 
+  function isCorrect(cardNumber) {
+    var arr = cardNumber.split('').map(function (char, index) {
+      var digit = parseInt(char, 10);
+
+      if ((index + cardNumber.length) % 2 === 0) {
+        var digitX2 = digit * 2;
+
+        return digitX2 > 9 ? digitX2 - 9 : digitX2;
+      }
+
+      return digit;
+    });
+
+    return !!(arr.reduce(function (a, b) {
+      return a + b;
+    }, 0) % 10);
+  }
+
   return {
     addToCard: function (event) {
       addToCard(event.target.dataset.cartproductname);
@@ -144,6 +163,12 @@ var cartModule = (function () {
 
     onDeliverRadioChange: function () {
       deliverRadio.addEventListener('click', radioToggle, false);
+    },
+
+    onCardNumberChange: function () {
+      cardNumberElement.addEventListener('change', function (evt) {
+        return isCorrect(evt.target.value) ? cardNumberElement.setCustomValidity('') : cardNumberElement.setCustomValidity('Invalid form');
+      });
     }
   };
 })();
@@ -424,6 +449,7 @@ var initModule = (function (options) {
         _cartModule.addToCard(event);
       });
 
+      _cartModule.onCardNumberChange();
 
       catalogCardsElement.classList.remove('catalog__cards--load');
       catalogLoadElement.classList.add('visually-hidden');
