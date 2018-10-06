@@ -22,6 +22,7 @@ var cartModule = (function () {
   var productCardsElement = document.querySelector('.goods__cards');
   var productCartEmpty = document.querySelector('#cards-empty').content.querySelector('.goods__card-empty');
   var cartLabel = document.querySelector('.main-header__basket');
+  var deliverRadio = document.querySelector('.deliver__toggle');
 
   var pickupForm = document.querySelector('.deliver__store');
   var deliverStoreId = 'deliver__store';
@@ -120,25 +121,29 @@ var cartModule = (function () {
     renderCartCards();
   }
 
+  function radioToggle(event) {
+    if (!event.target.id) {
+      return;
+    }
+
+    if (event.target.id === deliverStoreId) {
+      show(pickupForm);
+      hide(courierForm);
+    }
+
+    if (event.target.id === courierStoreId) {
+      show(courierForm);
+      hide(pickupForm);
+    }
+  }
+
   return {
     addToCard: function (event) {
       addToCard(event.target.dataset.cartproductname);
     },
 
-    radioToggle: function (event) {
-      if (!event.target.id) {
-        return;
-      }
-
-      if (event.target.id === deliverStoreId) {
-        show(pickupForm);
-        hide(courierForm);
-      }
-
-      if (event.target.id === courierStoreId) {
-        show(courierForm);
-        hide(pickupForm);
-      }
+    onDeliverRadioChange: function () {
+      deliverRadio.addEventListener('click', radioToggle, false);
     }
   };
 })();
@@ -360,6 +365,10 @@ var productModule = (function () {
 
     applyFilters: function (/* data*/) {
       // filters = data;
+    },
+
+    addBtnClick: function (callback) {
+      catalogCardsElement.addEventListener('click', callback);
     }
   };
 })();
@@ -398,23 +407,23 @@ var initModule = (function (options) {
 
   var catalogCardsElement = document.querySelector('.catalog__cards');
   var catalogLoadElement = document.querySelector('.catalog__load');
-  var deliverRadio = document.querySelector('.deliver__toggle');
 
   return {
     main: function () {
       _productModule.generateProducts();
       _filterModule.listenToPriceRadio();
 
-      deliverRadio.addEventListener('click', _cartModule.radioToggle, false);
+      _cartModule.onDeliverRadioChange();
 
       var filters = 'mock data';
       _filterModule.onFilterChange(function () {
         _productModule.applyFilters(filters);
       });
 
-      catalogCardsElement.addEventListener('click', function (event) {
+      _productModule.addBtnClick(function () {
         _cartModule.addToCard(event);
       });
+
 
       catalogCardsElement.classList.remove('catalog__cards--load');
       catalogLoadElement.classList.add('visually-hidden');
