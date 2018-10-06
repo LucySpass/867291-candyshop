@@ -1,7 +1,5 @@
 'use strict';
 
-var products = [];
-
 function getValueInArray(array) {
   return deleteUsedArrayValue(array, getRandomArrayValue(array));
 }
@@ -38,9 +36,9 @@ var cartModule = (function () {
     element.classList.remove('visually-hidden');
   }
 
-  function contains(array, itemName) {
+  function contains(array, product) {
     for (var i = 0; i < array.length; i++) {
-      if (array[i].name === itemName) {
+      if (array[i].name === product.name) {
         return i;
       }
     }
@@ -48,9 +46,7 @@ var cartModule = (function () {
   }
 
   function removeCart(element) {
-    while (element.firstChild) {
-      element.removeChild(element.firstChild);
-    }
+    element.innerHTML = '';
   }
 
   function createCartCard(product, cardOrderElement) {
@@ -99,18 +95,12 @@ var cartModule = (function () {
     productCartEmpty.classList.add('visually-hidden');
   }
 
-  function addToCard(productName) {
-    var productIndex = contains(products, productName);
-    if (productIndex < 0) {
-      return;
-    }
-    var product = products[productIndex];
-
+  function addToCard(product) {
     if (product.amount < 1) {
       return;
     }
 
-    var index = contains(cartProducts, productName);
+    var index = contains(cartProducts, product);
     if (index > -1) {
       cartProducts[index].cartAmount++;
     } else {
@@ -138,8 +128,8 @@ var cartModule = (function () {
   }
 
   return {
-    addToCard: function (event) {
-      addToCard(event.target.dataset.cartproductname);
+    addToCard: function (product) {
+      addToCard(product);
     },
 
     onDeliverRadioChange: function () {
@@ -152,6 +142,7 @@ var productModule = (function () {
   var RATING_NUMBER = 5;
   var AMOUNT_MIDDLE = 5;
   var SRC = 'img/cards/';
+  var products = [];
 
   var VALUES = [
     'one', 'two', 'three', 'four', 'five'
@@ -346,9 +337,8 @@ var productModule = (function () {
         favoriteBtn.classList.remove('card__btn-favorite--selected') :
         favoriteBtn.classList.add('card__btn-favorite--selected');
     });
-    addBtn.addEventListener('click', function (event) {
-      event.target.dataset.cartproductname = product.name;
-    });
+
+    addBtn.dataset.cartproductname = product.name;
 
     return cardElement;
   }
@@ -368,7 +358,15 @@ var productModule = (function () {
     },
 
     addBtnClick: function (callback) {
-      catalogCardsElement.addEventListener('click', callback);
+      catalogCardsElement.addEventListener('click', function (event) {
+        var productArray = products.filter(function (product) {
+          if (product.name === event.target.dataset.cartproductname) {
+            return product;
+          }
+          return null;
+        });
+        callback(productArray[0]);
+      });
     }
   };
 })();
@@ -378,7 +376,8 @@ var filterModule = (function () {
   var rangeBtnRight = document.querySelector('.range__btn--right');
   var maxPriceElement = document.querySelector('.range__price--max');
   var minPriceElement = document.querySelector('.range__price--min');
-  var filterCallback;
+
+  // var filterCallback;
 
   function changePriceRange(event) {
     if (event.target.innerText === 'правый ползунок') {
@@ -393,9 +392,8 @@ var filterModule = (function () {
       rangeBtnLeft.addEventListener('mouseup', changePriceRange);
       rangeBtnRight.addEventListener('mouseup', changePriceRange);
     },
-    onFilterChange: function (callback) {
-      filterCallback = callback;
-      filterCallback();
+    onFilterChange: function (/* callback*/) {
+      // filterCallback = callback;
     }
   };
 })();
@@ -420,9 +418,7 @@ var initModule = (function (options) {
         _productModule.applyFilters(filters);
       });
 
-      _productModule.addBtnClick(function () {
-        _cartModule.addToCard(event);
-      });
+      _productModule.addBtnClick(_cartModule.addToCard);
 
 
       catalogCardsElement.classList.remove('catalog__cards--load');
