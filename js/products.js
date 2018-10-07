@@ -21,12 +21,19 @@ var cartModule = (function () {
   var productCartEmpty = document.querySelector('#cards-empty').content.querySelector('.goods__card-empty');
   var cartLabel = document.querySelector('.main-header__basket');
   var deliverRadio = document.querySelector('.deliver__toggle');
+  var paymentMethodRadio = document.querySelector('.payment');
 
   var pickupForm = document.querySelector('.deliver__store');
   var deliverStoreId = 'deliver__store';
 
   var courierForm = document.querySelector('.deliver__courier');
   var courierStoreId = 'deliver__courier';
+
+  var cardForm = document.querySelector('.payment__card-wrap');
+  var cardId = 'payment__card';
+
+  var cashForm = document.querySelector('.payment__cash-wrap');
+  var cashId = 'payment__cash';
 
   function hide(element) {
     element.classList.add('visually-hidden');
@@ -111,7 +118,7 @@ var cartModule = (function () {
     renderCartCards();
   }
 
-  function radioToggle(event) {
+  function deliverRadioToggle(event) {
     if (!event.target.id) {
       return;
     }
@@ -127,13 +134,33 @@ var cartModule = (function () {
     }
   }
 
+  function paymentRadioToggle(event) {
+    if (!event.target.id) {
+      return;
+    }
+
+    if (event.target.id === cardId) {
+      show(cardForm);
+      hide(cashForm);
+    }
+
+    if (event.target.id === cashId) {
+      show(cashForm);
+      hide(cardForm);
+    }
+  }
+
   return {
     addToCard: function (product) {
       addToCard(product);
     },
 
     onDeliverRadioChange: function () {
-      deliverRadio.addEventListener('click', radioToggle, false);
+      deliverRadio.addEventListener('click', deliverRadioToggle, false);
+    },
+
+    onPaymentRadioChange: function () {
+      paymentMethodRadio.addEventListener('click', paymentRadioToggle, false);
     }
   };
 })();
@@ -475,6 +502,7 @@ var initModule = (function (options) {
       _filterModule.listenToPriceRadio();
 
       _cartModule.onDeliverRadioChange();
+      _cartModule.onPaymentRadioChange();
 
       var filters = 'mock data';
       _filterModule.onFilterChange(function () {
