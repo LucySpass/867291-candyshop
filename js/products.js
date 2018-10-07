@@ -1,7 +1,5 @@
 'use strict';
 
-var products = [];
-
 function getValueInArray(array) {
   return deleteUsedArrayValue(array, getRandomArrayValue(array));
 }
@@ -39,9 +37,9 @@ var cartModule = (function () {
     element.classList.remove('visually-hidden');
   }
 
-  function contains(array, itemName) {
+  function contains(array, product) {
     for (var i = 0; i < array.length; i++) {
-      if (array[i].name === itemName) {
+      if (array[i].name === product.name) {
         return i;
       }
     }
@@ -49,9 +47,7 @@ var cartModule = (function () {
   }
 
   function removeCart(element) {
-    while (element.firstChild) {
-      element.removeChild(element.firstChild);
-    }
+    element.innerHTML = '';
   }
 
   function createCartCard(product, cardOrderElement) {
@@ -100,18 +96,12 @@ var cartModule = (function () {
     productCartEmpty.classList.add('visually-hidden');
   }
 
-  function addToCard(productName) {
-    var productIndex = contains(products, productName);
-    if (productIndex < 0) {
-      return;
-    }
-    var product = products[productIndex];
-
+  function addToCard(product) {
     if (product.amount < 1) {
       return;
     }
 
-    var index = contains(cartProducts, productName);
+    var index = contains(cartProducts, product);
     if (index > -1) {
       cartProducts[index].cartAmount++;
     } else {
@@ -157,8 +147,8 @@ var cartModule = (function () {
   }
 
   return {
-    addToCard: function (event) {
-      addToCard(event.target.dataset.cartproductname);
+    addToCard: function (product) {
+      addToCard(product);
     },
 
     onDeliverRadioChange: function () {
@@ -177,6 +167,7 @@ var productModule = (function () {
   var RATING_NUMBER = 5;
   var AMOUNT_MIDDLE = 5;
   var SRC = 'img/cards/';
+  var products = [];
 
   var VALUES = [
     'one', 'two', 'three', 'four', 'five'
@@ -371,9 +362,8 @@ var productModule = (function () {
         favoriteBtn.classList.remove('card__btn-favorite--selected') :
         favoriteBtn.classList.add('card__btn-favorite--selected');
     });
-    addBtn.addEventListener('click', function (event) {
-      event.target.dataset.cartproductname = product.name;
-    });
+
+    addBtn.dataset.cartproductname = product.name;
 
     return cardElement;
   }
@@ -393,34 +383,105 @@ var productModule = (function () {
     },
 
     addBtnClick: function (callback) {
-      catalogCardsElement.addEventListener('click', callback);
+      catalogCardsElement.addEventListener('click', function (event) {
+        var productArray = products.filter(function (product) {
+          if (product.name === event.target.dataset.cartproductname) {
+            return product;
+          }
+          return null;
+        });
+        callback(productArray[0]);
+      });
     }
   };
 })();
 
 var filterModule = (function () {
-  var rangeBtnLeft = document.querySelector('.range__btn--left');
-  var rangeBtnRight = document.querySelector('.range__btn--right');
-  var maxPriceElement = document.querySelector('.range__price--max');
-  var minPriceElement = document.querySelector('.range__price--min');
-  var filterCallback;
+  var rangeMin = document.querySelector('.range__btn--left');
+  var rangeMax = document.querySelector('.range__btn--right');
+  var priceMin = document.querySelector('.range__price--min');
+  var priceMax = document.querySelector('.range__price--max');
+  var sliderLine = document.querySelector('.range__filter');
+  var sliderFillLine = document.querySelector('.range__fill-line');
+  // var filterCallback;
 
-  function changePriceRange(event) {
-    if (event.target.innerText === 'правый ползунок') {
-      maxPriceElement.innerHTML = 'lala';
-    } else {
-      minPriceElement.innerHTML = 'la';
+  var min = parseInt(getComputedStyle(rangeMin).left, 10);
+  var max = parseInt(getComputedStyle(rangeMax).left, 10);
+  var MIN = 0;
+  var MAX = 245;
+  var ELEMENT_WIDTH = 240;
+  var sliderLineCoords = getCoords(sliderLine);
+
+  function rangeMaxMouseDownHandler(evt) {
+    var elMaxCoords = getCoords(rangeMax);
+    var shiftX = evt.pageX - elMaxCoords.left;
+    document.addEventListener('mousemove', rangeMaxMouseMoveHandler);
+
+    function rangeMaxMouseMoveHandler(e) {
+      priceMax.textContent = parseInt(max, 10);
+
+      var newRight = e.pageX - shiftX - sliderLineCoords.left;
+      if (newRight > MAX) {
+        newRight = MAX;
+      }
+      if (newRight < min + rangeMin.offsetWidth / 2) {
+        newRight = min + rangeMin.offsetWidth / 2;
+      }
+      max = newRight;
+      rangeMax.style.left = newRight + 'px';
+      sliderFillLine.style.right = ELEMENT_WIDTH - newRight + 'px';
     }
+
+    function rangeMaxMouseUpHandler() {
+      document.removeEventListener('mousemove', rangeMaxMouseMoveHandler);
+      document.removeEventListener('mouseup', rangeMaxMouseUpHandler);
+    }
+
+    document.addEventListener('mouseup', rangeMaxMouseUpHandler);
+  }
+
+  function rangeMinMouseDownHandler(evt) {
+    var elMinCoords = getCoords(rangeMin);
+    var shiftX = evt.pageX - elMinCoords.left;
+    document.addEventListener('mousemove', rangeMinMouseMoveHandler);
+
+    function rangeMinMouseMoveHandler(e) {
+      priceMin.textContent = parseInt(min, 10);
+      var newLeft = e.pageX - shiftX - sliderLineCoords.left;
+      if (newLeft < MIN) {
+        newLeft = MIN;
+      }
+      if (newLeft > max - rangeMax.offsetWidth / 2) {
+        newLeft = max - rangeMax.offsetWidth / 2;
+      }
+      min = newLeft;
+      rangeMin.style.left = newLeft + 'px';
+      sliderFillLine.style.left = newLeft + 'px';
+    }
+
+    function rangeMinMouseUpHandler() {
+      document.removeEventListener('mousemove', rangeMinMouseMoveHandler);
+      document.removeEventListener('mouseup', rangeMinMouseUpHandler);
+    }
+
+    document.addEventListener('mouseup', rangeMinMouseUpHandler);
+  }
+
+  function getCoords(elem) {
+    var elCoords = elem.getBoundingClientRect();
+    return {
+      top: elCoords.top + pageYOffset,
+      left: elCoords.left + pageXOffset
+    };
   }
 
   return {
     listenToPriceRadio: function () {
-      rangeBtnLeft.addEventListener('mouseup', changePriceRange);
-      rangeBtnRight.addEventListener('mouseup', changePriceRange);
+      rangeMin.addEventListener('mousedown', rangeMinMouseDownHandler);
+      rangeMax.addEventListener('mousedown', rangeMaxMouseDownHandler);
     },
-    onFilterChange: function (callback) {
-      filterCallback = callback;
-      filterCallback();
+    onFilterChange: function (/* callback*/) {
+      // filterCallback = callback;
     }
   };
 })();
@@ -445,9 +506,7 @@ var initModule = (function (options) {
         _productModule.applyFilters(filters);
       });
 
-      _productModule.addBtnClick(function () {
-        _cartModule.addToCard(event);
-      });
+      _productModule.addBtnClick(_cartModule.addToCard);
 
       _cartModule.onCardNumberChange();
 
