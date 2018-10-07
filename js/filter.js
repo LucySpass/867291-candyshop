@@ -96,8 +96,9 @@ var initModule = (function (options) {
   return {
     main: function () {
       var filters = 'mock data';
+      _filterModule.listenToPriceRadio();
       _filterModule.onFilterChange(function () {
-        _productModule.applyFilters(filters);
+        window.productModule.applyFilters(filters);
       });
     }
   };

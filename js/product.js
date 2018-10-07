@@ -250,17 +250,10 @@ var productModule = (function () {
 var initModule = (function (options) {
   var _productModule = options.productModule;
 
-  var catalogCardsElement = document.querySelector('.catalog__cards');
-  var catalogLoadElement = document.querySelector('.catalog__load');
-
   return {
     main: function () {
       _productModule.generateProducts();
-
-      _productModule.addBtnClick(_cartModule.addToCard);
-
-      catalogCardsElement.classList.remove('catalog__cards--load');
-      catalogLoadElement.classList.add('visually-hidden');
+      _productModule.addBtnClick(window.cartModule.addToCard);
     }
   };
 })({productModule: productModule});
