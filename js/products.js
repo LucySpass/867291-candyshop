@@ -129,21 +129,21 @@ var cartModule = (function () {
   }
 
   function isCorrect(cardNumber) {
-    var arr = cardNumber.split('').map(function (char, index) {
-      var digit = parseInt(char, 10);
+    var arr = cardNumber.split('').map(function (num, index) {
+      var digit = parseInt(num, 10);
+      if (index % 2 === 0) {
 
-      if ((index + cardNumber.length) % 2 === 0) {
-        var digitX2 = digit * 2;
-
-        return digitX2 > 9 ? digitX2 - 9 : digitX2;
+        return digit * 2 > 9 ? digit * 2 - 9 : digit * 2;
       }
 
       return digit;
     });
 
-    return !!(arr.reduce(function (a, b) {
-      return a + b;
-    }, 0) % 10);
+    var result = arr.reduce(function (previousValue, currentValue) {
+      return previousValue + currentValue;
+    });
+
+    return (result >= 10 && result % 10 === 0);
   }
 
   return {
