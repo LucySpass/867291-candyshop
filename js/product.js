@@ -125,6 +125,17 @@ var productModule = (function () {
   var PRODUCTS_AMOUNT = 26;
   var catalogCardsElement = document.querySelector('.catalog__cards');
 
+  var modalError = document.querySelector('.modal--error');
+  var modalMessage = modalError.querySelector('.modal__message');
+  var modalClose = modalError.querySelector('.modal__close');
+
+  function modalKeydownHandler(evt) {
+    if (evt.keyCode === 27) {
+      modalError.classList.add('modal--hidden');
+      document.removeEventListener('keydown', modalKeydownHandler);
+    }
+  }
+
   // var filters;
 
   function getValueInArray(array) {
@@ -219,15 +230,39 @@ var productModule = (function () {
     return cardElement;
   }
 
+  function showError(error) {
+    modalError.classList.remove('modal--hidden');
+    modalMessage.textContent = error;
+
+    modalClose.addEventListener('click', function () {
+      modalError.classList.add('modal--hidden');
+      document.removeEventListener('keydown', modalKeydownHandler);
+    });
+
+    document.addEventListener('keydown', modalKeydownHandler);
+  }
+
   return {
-    generateProducts: function () {
+    getProducts: function (serverProducts) {
+      console.log('hello?');
+      var catalogLoad = document.querySelector('.catalog__load');
+
+      catalogCardsElement.classList.remove('catalog__cards--load');
+      catalogLoad.classList.add('visually-hidden');
+
+      products = JSON.parse(serverProducts);
+      products.forEach(function (product) {
+        product.picture = SRC + product.picture;
+      });
+
       var fragment = document.createDocumentFragment();
-      for (var i = 0; i < PRODUCTS_AMOUNT; i++) {
-        products.push(generateProduct());
+      for (var i = 0; i < products.length; i++) {
         fragment.appendChild(renderCard(products[i]));
       }
       catalogCardsElement.appendChild(fragment);
     },
+
+    showError: showError,
 
     applyFilters: function (/* data*/) {
       // filters = data;
@@ -246,3 +281,5 @@ var productModule = (function () {
     }
   };
 })();
+
+window.productModule = productModule;

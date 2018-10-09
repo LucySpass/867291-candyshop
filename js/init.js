@@ -4,16 +4,16 @@ var initModule = (function (options) {
   var _cartModule = options.cartModule;
   var _productModule = options.productModule;
   var _filterModule = options.filterModule;
-
-  var catalogCardsElement = document.querySelector('.catalog__cards');
-  var catalogLoadElement = document.querySelector('.catalog__load');
+  var _loadModule = options.loadModule;
 
   return {
     main: function () {
       _cartModule.onDeliverRadioChange();
       _cartModule.onCardNumberChange();
+      _cartModule.onCartDateChange();
 
-      _productModule.generateProducts();
+      _loadModule.load(_productModule.getProducts, _productModule.showError);
+
       _productModule.addBtnClick(_cartModule.addToCard);
 
       var filters = 'mock data';
@@ -22,10 +22,16 @@ var initModule = (function (options) {
         _productModule.applyFilters(filters);
       });
 
-      catalogCardsElement.classList.remove('catalog__cards--load');
-      catalogLoadElement.classList.add('visually-hidden');
+      var loader = document.createElement('script');
+      loader.src = _loadModule.DATA_URL + '?callback=' + _loadModule.CALLBACK_NAME;
+      document.body.append(loader);
     }
   };
-})({cartModule: window.cartModule, productModule: window.productModule, filterModule: window.filterModule});
+})({
+  cartModule: window.cartModule,
+  productModule: window.productModule,
+  filterModule: window.filterModule,
+  loadModule: window.loadModule
+});
 
 initModule.main();

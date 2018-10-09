@@ -89,3 +89,5 @@ var filterModule = (function () {
     }
   };
 })();
+
+window.filterModule = filterModule;

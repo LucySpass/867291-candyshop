@@ -15,6 +15,18 @@ var cartModule = (function () {
   var courierForm = document.querySelector('.deliver__courier');
   var courierStoreId = 'deliver__courier';
 
+  var form = document.querySelector('form:nth-child(2)');
+  var contactDataName = form.querySelector('#contact-data__name');
+  var contactDataTel = form.querySelector('#contact-data__tel');
+  var paymentCardNumber = form.querySelector('#payment__card-number');
+  var paymentCardDate = form.querySelector('#payment__card-date');
+  var paymentСardСVC = form.querySelector('#payment__card-cvc');
+  var paymentCardholder = form.querySelector('#payment__cardholder');
+  var deliverStreet = form.querySelector('#deliver_street');
+  var deliverHouse = form.querySelector('#deliver_house');
+  var deliverFloor = form.querySelector('#deliver__floor');
+  var deliverRoom = form.querySelector('#deliver__room');
+
   function hide(element) {
     element.classList.add('visually-hidden');
   }
@@ -132,6 +144,14 @@ var cartModule = (function () {
     return (result >= 10 && result % 10 === 0);
   }
 
+  function keyupHandler(evt) {
+    if (evt.keyCode !== 8) {
+      if (paymentCardDate.value.length === 2) {
+        paymentCardDate.value += '/';
+      }
+    }
+  }
+
   return {
     addToCard: addToCard,
 
@@ -143,6 +163,12 @@ var cartModule = (function () {
       cardNumberElement.addEventListener('change', function (evt) {
         return isCorrect(evt.target.value) ? cardNumberElement.setCustomValidity('') : cardNumberElement.setCustomValidity('Invalid form');
       });
+    },
+
+    onCartDateChange: function () {
+      paymentCardDate.addEventListener('keyup', keyupHandler);
     }
   };
 })();
+
+window.cartModule = cartModule;
