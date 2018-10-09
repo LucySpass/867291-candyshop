@@ -146,3 +146,5 @@ var cartModule = (function () {
     }
   };
 })();
+
+window.cartModule = cartModule;
