@@ -152,6 +152,30 @@ var cartModule = (function () {
     }
   }
 
+  function formPost(evt) {
+
+  }
+
+  function showError(errorMessage) {
+    var errorDialog = document.querySelector('.modal--error');
+    var modalMessage = errorDialog.querySelector('.modal__message');
+
+    errorDialog.classList.remove('modal--hidden');
+    modalMessage.textContent = errorMessage;
+
+    var modalСlose = errorDialog.querySelector('.modal__close');
+    modalСlose.addEventListener('click', function () {
+      errorDialog.classList.add('modal--hidden');
+    });
+
+    document.addEventListener('keydown', function modalKeydownHandler(evt) {
+      if (evt.keyCode === 27) {
+        errorDialog.classList.add('modal--hidden');
+        document.removeEventListener('keydown', modalKeydownHandler);
+      }
+    });
+  }
+
   return {
     addToCard: addToCard,
 
@@ -159,14 +183,20 @@ var cartModule = (function () {
       deliverRadio.addEventListener('click', radioToggle, false);
     },
 
-    onCardNumberChange: function () {
+    onFormChange: function () {
       cardNumberElement.addEventListener('change', function (evt) {
         return isCorrect(evt.target.value) ? cardNumberElement.setCustomValidity('') : cardNumberElement.setCustomValidity('Invalid form');
       });
-    },
 
-    onCartDateChange: function () {
       paymentCardDate.addEventListener('keyup', keyupHandler);
+
+      form.addEventListener('submit', function (evt) {
+        window.upload(new FormData(form), formPost, showError);
+        document.querySelectorAll('input').forEach(function (inputElement) {
+          inputElement.value = inputElement.defaultValue;
+        });
+        evt.preventDefault();
+      });
     }
   };
 })();

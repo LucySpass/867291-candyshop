@@ -5,156 +5,22 @@ var productModule = (function () {
   var AMOUNT_MIDDLE = 5;
   var SRC = 'img/cards/';
   var products = [];
+  var errorDialog = document.querySelector('.modal--error');
 
   var VALUES = [
     'one', 'two', 'three', 'four', 'five'
   ];
 
-  var AMOUNT = {
-    min: 0, max: 20
-  };
-
-  var PRICE = {
-    min: 100, max: 1500
-  };
-
-  var WEIGHT = {
-    min: 30, max: 300
-  };
-
-  var RATING = {
-    VALUES: {
-      min: 1, max: 5
-    },
-    RATINGS: {
-      min: 10, max: 900
-    }
-  };
-
-  var NUTRITION_FACTS = {
-    SUGAR: {
-      min: 0, max: 1
-    },
-    ENERGY: {
-      min: 70, max: 500
-    },
-    CONTENTS: [
-      'молоко',
-      'сливки',
-      'вода',
-      'пищевой краситель',
-      'патока',
-      'ароматизатор бекона',
-      'ароматизатор свинца',
-      'ароматизатор дуба, идентичный натуральному',
-      'ароматизатор картофеля',
-      'лимонная кислота',
-      'лимонная кислота',
-      'эмульгатор',
-      'консервант: сорбат калия',
-      'посолочная смесь: соль, нитрит натрия',
-      'ксилит',
-      'карбамид',
-      'вилларибо',
-      'виллабаджо'
-    ]
-  };
-
-  var NAMES = [
-    'Чесночные сливки',
-    'Огуречный педант',
-    'Молочная хрюша',
-    'Грибной шейк',
-    'Баклажановое безумие',
-    'Паприколу итальяно',
-    'Нинзя-удар васаби',
-    'Хитрый баклажан',
-    'Горчичный вызов',
-    'Кедровая липучка',
-    'Корманный портвейн',
-    'Чилийский задира',
-    'Беконовый взрыв',
-    'Арахис vs виноград',
-    'Сельдерейная душа',
-    'Початок в бутылке',
-    'Чернющий мистер чеснок',
-    'Раша федераша',
-    'Кислая мина',
-    'Кукурузное утро',
-    'Икорный фуршет',
-    'Новогоднее настроение',
-    'С пивком потянет',
-    'Мисс креветка',
-    'Бесконечный взрыв',
-    'Невинные винные',
-    'Бельгийское пенное',
-    'Острый язычок'
-  ];
-
-  var PICTURES = [
-    'gum-cedar.jpg',
-    'gum-chile.jpg',
-    'gum-eggplant.jpg',
-    'gum-mustard.jpg',
-    'gum-portwine.jpg',
-    'gum-wasabi.jpg',
-    'ice-eggplant.jpg',
-    'ice-cucumber.jpg',
-    'ice-garlic.jpg',
-    'ice-italian.jpg',
-    'ice-mushroom.jpg',
-    'ice-pig.jpg',
-    'marmalade-beer.jpg',
-    'marmalade-caviar.jpg',
-    'marmalade-corn.jpg',
-    'marmalade-new-year.jpg',
-    'marmalade-sour.jpg',
-    'marshmallow-bacon.jpg',
-    'marshmallow-beer.jpg',
-    'marshmallow-shrimp.jpg',
-    'marshmallow-spicy.jpg',
-    'marshmallow-wine.jpg',
-    'soda-bacon.jpg',
-    'soda-celery.jpg',
-    'soda-cob.jpg',
-    'soda-garlic.jpg',
-    'soda-peanut-grapes.jpg',
-    'soda-russian.jpg'
-  ];
-
-  var PRODUCTS_AMOUNT = 26;
   var catalogCardsElement = document.querySelector('.catalog__cards');
 
-  var modalError = document.querySelector('.modal--error');
-  var modalMessage = modalError.querySelector('.modal__message');
-  var modalClose = modalError.querySelector('.modal__close');
-
-  function modalKeydownHandler(evt) {
+  function errorDialogClose(evt) {
     if (evt.keyCode === 27) {
-      modalError.classList.add('modal--hidden');
-      document.removeEventListener('keydown', modalKeydownHandler);
+      errorDialog.classList.add('modal--hidden');
+      document.removeEventListener('keydown', errorDialogClose);
     }
   }
 
   // var filters;
-
-  function getValueInArray(array) {
-    return deleteUsedArrayValue(array, getRandomArrayValue(array));
-  }
-
-  function getRandomArrayValue(array) {
-    var index = Math.floor(Math.random() * array.length);
-    return array[index];
-  }
-
-  function deleteUsedArrayValue(array, value) {
-    array.splice(array.indexOf(value), 1);
-    return value;
-  }
-
-  function getRandomNumberInRange(obj) {
-    return Math.floor(Math.random() * (obj.max - obj.min + 1)) + obj.min;
-  }
 
   function getAmountClass(element, amount) {
     if (amount < AMOUNT_MIDDLE) {
@@ -171,25 +37,6 @@ var productModule = (function () {
       ratingElem.classList.add('stars__rating--' + VALUES[good.rating.value]);
     }
   };
-
-  function generateProduct() {
-    return {
-      name: getValueInArray(NAMES),
-      picture: SRC + getValueInArray(PICTURES),
-      amount: getRandomNumberInRange(AMOUNT),
-      price: getRandomNumberInRange(PRICE),
-      weight: getRandomNumberInRange(WEIGHT),
-      rating: {
-        value: getRandomNumberInRange(RATING.VALUES),
-        number: getRandomNumberInRange(RATING.RATINGS)
-      },
-      nutritionFacts: {
-        sugar: getRandomNumberInRange(NUTRITION_FACTS.SUGAR),
-        energy: getRandomNumberInRange(NUTRITION_FACTS.ENERGY),
-        contents: getRandomArrayValue(NUTRITION_FACTS.CONTENTS)
-      }
-    };
-  }
 
   function renderCard(product) {
     var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
@@ -231,20 +78,22 @@ var productModule = (function () {
   }
 
   function showError(error) {
-    modalError.classList.remove('modal--hidden');
-    modalMessage.textContent = error;
+    var errorDialogMessage = errorDialog.querySelector('.modal__message');
+    var closeDialogBtn = errorDialog.querySelector('.modal__close');
 
-    modalClose.addEventListener('click', function () {
-      modalError.classList.add('modal--hidden');
-      document.removeEventListener('keydown', modalKeydownHandler);
+    errorDialog.classList.remove('modal--hidden');
+    errorDialogMessage.textContent = error;
+
+    closeDialogBtn.addEventListener('click', function () {
+      errorDialog.classList.add('modal--hidden');
+      document.removeEventListener('keydown', errorDialogClose);
     });
 
-    document.addEventListener('keydown', modalKeydownHandler);
+    document.addEventListener('keydown', errorDialogClose);
   }
 
   return {
     getProducts: function (serverProducts) {
-      console.log('hello?');
       var catalogLoad = document.querySelector('.catalog__load');
 
       catalogCardsElement.classList.remove('catalog__cards--load');
@@ -270,13 +119,15 @@ var productModule = (function () {
 
     addBtnClick: function (callback) {
       catalogCardsElement.addEventListener('click', function (event) {
-        var productArray = products.filter(function (product) {
-          if (product.name === event.target.dataset.cartproductname) {
-            return product;
-          }
-          return null;
-        });
-        callback(productArray[0]);
+        if (event.target.classList.contains('card__btn')) {
+          var productArray = products.filter(function (product) {
+            if (product.name === event.target.dataset.cartproductname) {
+              return product;
+            }
+            return null;
+          });
+          callback(productArray[0]);
+        }
       });
     }
   };
