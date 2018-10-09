@@ -10,7 +10,6 @@ var loadModule = (function () {
     xhr.responceType = 'json';
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
-        // onLoad(xhr.response);
         CALLBACK_NAME = onLoad(xhr.response);
       } else {
         onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
