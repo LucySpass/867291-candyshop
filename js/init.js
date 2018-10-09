@@ -9,6 +9,7 @@ var initModule = (function (options) {
   return {
     main: function () {
       _cartModule.onDeliverRadioChange();
+      _cartModule.onPaymentRadioChange();
       _cartModule.onFormChange();
 
       _loadModule.load(_productModule.getProducts, _productModule.showError);

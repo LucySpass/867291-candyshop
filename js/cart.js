@@ -8,6 +8,7 @@ var cartModule = (function () {
   var cartLabel = document.querySelector('.main-header__basket');
   var deliverRadio = document.querySelector('.deliver__toggle');
   var cardNumberElement = document.querySelector('#payment__card-number');
+  var paymentMethodRadio = document.querySelector('.payment');
 
   var pickupForm = document.querySelector('.deliver__store');
   var deliverStoreId = 'deliver__store';
@@ -15,17 +16,17 @@ var cartModule = (function () {
   var courierForm = document.querySelector('.deliver__courier');
   var courierStoreId = 'deliver__courier';
 
+  var cardForm = document.querySelector('.payment__card-wrap');
+  var cardId = 'payment__card';
+
+  var cashForm = document.querySelector('.payment__cash-wrap');
+  var cashId = 'payment__cash';
+
   var form = document.querySelector('form:nth-child(2)');
-  var contactDataName = form.querySelector('#contact-data__name');
-  var contactDataTel = form.querySelector('#contact-data__tel');
-  var paymentCardNumber = form.querySelector('#payment__card-number');
   var paymentCardDate = form.querySelector('#payment__card-date');
-  var paymentСardСVC = form.querySelector('#payment__card-cvc');
-  var paymentCardholder = form.querySelector('#payment__cardholder');
-  var deliverStreet = form.querySelector('#deliver_street');
-  var deliverHouse = form.querySelector('#deliver_house');
-  var deliverFloor = form.querySelector('#deliver__floor');
-  var deliverRoom = form.querySelector('#deliver__room');
+
+  var errorDialog = document.querySelector('.modal--error');
+  var modalSuccess = document.querySelector('.modal--success');
 
   function hide(element) {
     element.classList.add('visually-hidden');
@@ -110,7 +111,7 @@ var cartModule = (function () {
     renderCartCards();
   }
 
-  function radioToggle(event) {
+  function deliverRadioToggle(event) {
     if (!event.target.id) {
       return;
     }
@@ -126,12 +127,30 @@ var cartModule = (function () {
     }
   }
 
+  function paymentRadioToggle(event) {
+    if (!event.target.id) {
+      return;
+    }
+
+    if (event.target.id === cardId) {
+      show(cardForm);
+      hide(cashForm);
+    }
+
+    if (event.target.id === cashId) {
+      show(cashForm);
+      hide(cardForm);
+    }
+  }
+
   function isCorrect(cardNumber) {
     var arr = cardNumber.split('').map(function (num, index) {
       var digit = parseInt(num, 10);
-      if (index % 2 === 0) {
 
-        return digit * 2 > 9 ? digit * 2 - 9 : digit * 2;
+      if ((index + cardNumber.length) % 2 === 0) {
+        var digitX2 = digit * 2;
+
+        return digitX2 > 9 ? digitX2 - 9 : digitX2;
       }
 
       return digit;
@@ -152,19 +171,31 @@ var cartModule = (function () {
     }
   }
 
-  function formPost(evt) {
+  function successModalKeydownHandler() {
+    modalSuccess.classList.add('modal--hidden');
+    document.removeEventListener('keydown', successModalKeydownHandler);
+  }
+
+  function formPost() {
+    var errorDialogCloseBtn = errorDialog.querySelector('.modal__close');
+    modalSuccess.classList.remove('modal--hidden');
+
+    errorDialogCloseBtn.addEventListener('click', function () {
+      modalSuccess.classList.add('modal--hidden');
+    });
+
+    document.addEventListener('keydown', successModalKeydownHandler);
 
   }
 
   function showError(errorMessage) {
-    var errorDialog = document.querySelector('.modal--error');
-    var modalMessage = errorDialog.querySelector('.modal__message');
+    var errorDialogMessage = errorDialog.querySelector('.modal__message');
+    var errorDialogCloseBtn = errorDialog.querySelector('.modal__close');
 
     errorDialog.classList.remove('modal--hidden');
-    modalMessage.textContent = errorMessage;
+    errorDialogMessage.textContent = errorMessage;
 
-    var modalСlose = errorDialog.querySelector('.modal__close');
-    modalСlose.addEventListener('click', function () {
+    errorDialogCloseBtn.addEventListener('click', function () {
       errorDialog.classList.add('modal--hidden');
     });
 
@@ -180,12 +211,16 @@ var cartModule = (function () {
     addToCard: addToCard,
 
     onDeliverRadioChange: function () {
-      deliverRadio.addEventListener('click', radioToggle, false);
+      deliverRadio.addEventListener('click', deliverRadioToggle, false);
+    },
+
+    onPaymentRadioChange: function () {
+      paymentMethodRadio.addEventListener('click', paymentRadioToggle, false);
     },
 
     onFormChange: function () {
       cardNumberElement.addEventListener('change', function (evt) {
-        return isCorrect(evt.target.value) ? cardNumberElement.setCustomValidity('') : cardNumberElement.setCustomValidity('Invalid form');
+        return isCorrect(evt.target.value) ? cardNumberElement.setCustomValidity('') : cardNumberElement.setCustomValidity('Invalid card');
       });
 
       paymentCardDate.addEventListener('keyup', keyupHandler);
