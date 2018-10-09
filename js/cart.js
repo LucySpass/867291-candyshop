@@ -83,7 +83,7 @@ var cartModule = (function () {
   }
 
   function addToCard(product) {
-    if (product.amount < 1) {
+    if (product.amount < 1 || (!product)) {
       return;
     }
 
@@ -133,9 +133,7 @@ var cartModule = (function () {
   }
 
   return {
-    addToCard: function (product) {
-      addToCard(product);
-    },
+    addToCard: addToCard,
 
     onDeliverRadioChange: function () {
       deliverRadio.addEventListener('click', radioToggle, false);
@@ -148,16 +146,3 @@ var cartModule = (function () {
     }
   };
 })();
-
-var initModule = (function (options) {
-  var _cartModule = options.cartModule;
-
-  return {
-    main: function () {
-      _cartModule.onDeliverRadioChange();
-      _cartModule.onCardNumberChange();
-    }
-  };
-})({cartModule: cartModule});
-
-initModule.main();

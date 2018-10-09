@@ -632,6 +632,7 @@ body {
   font-weight: bold;
   text-decoration: none;
   background-color: #ffdd21;
+  cursor: pointer;
 }
 .card--in-stock .card__btn:hover {
   background-color: #82da03;

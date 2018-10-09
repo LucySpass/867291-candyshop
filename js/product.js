@@ -246,16 +246,3 @@ var productModule = (function () {
     }
   };
 })();
-
-var initModule = (function (options) {
-  var _productModule = options.productModule;
-
-  return {
-    main: function () {
-      _productModule.generateProducts();
-      _productModule.addBtnClick(window.cartModule.addToCard);
-    }
-  };
-})({productModule: productModule});
-
-initModule.main();

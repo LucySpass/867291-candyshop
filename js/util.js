@@ -1,6 +1,6 @@
 'use strict';
 
-var initModule = (function () {
+var utilModule = (function () {
   var catalogCardsElement = document.querySelector('.catalog__cards');
   var catalogLoadElement = document.querySelector('.catalog__load');
 
@@ -12,4 +12,4 @@ var initModule = (function () {
   };
 })();
 
-initModule.main();
+utilModule.main();

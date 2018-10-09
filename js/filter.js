@@ -89,19 +89,3 @@ var filterModule = (function () {
     }
   };
 })();
-
-var initModule = (function (options) {
-  var _filterModule = options.filterModule;
-
-  return {
-    main: function () {
-      var filters = 'mock data';
-      _filterModule.listenToPriceRadio();
-      _filterModule.onFilterChange(function () {
-        window.productModule.applyFilters(filters);
-      });
-    }
-  };
-})({filterModule: filterModule});
-
-initModule.main();
