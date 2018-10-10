@@ -4,9 +4,7 @@ var initModule = (function (options) {
   var _cartModule = options.cartModule;
   var _productModule = options.productModule;
   var _filterModule = options.filterModule;
-
-  var catalogCardsElement = document.querySelector('.catalog__cards');
-  var catalogLoadElement = document.querySelector('.catalog__load');
+  var _utilModule = options.utilModule;
 
   return {
     main: function () {
@@ -22,10 +20,14 @@ var initModule = (function (options) {
         _productModule.applyFilters(filters);
       });
 
-      catalogCardsElement.classList.remove('catalog__cards--load');
-      catalogLoadElement.classList.add('visually-hidden');
+      _utilModule.resolveClasses();
     }
   };
-})({cartModule: window.cartModule, productModule: window.productModule, filterModule: window.filterModule});
+})({
+  cartModule: window.cartModule,
+  productModule: window.productModule,
+  filterModule: window.filterModule,
+  utilModule: window.utilModule
+});
 
 initModule.main();

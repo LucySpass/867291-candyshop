@@ -5,11 +5,11 @@ var utilModule = (function () {
   var catalogLoadElement = document.querySelector('.catalog__load');
 
   return {
-    main: function () {
+    resolveClasses: function () {
       catalogCardsElement.classList.remove('catalog__cards--load');
       catalogLoadElement.classList.add('visually-hidden');
     }
   };
 })();
 
-utilModule.main();
+window.utilModule = utilModule;
