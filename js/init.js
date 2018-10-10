@@ -21,10 +21,6 @@ var initModule = (function (options) {
       _filterModule.onFilterChange(function () {
         _productModule.applyFilters(filters);
       });
-
-      var loader = document.createElement('script');
-      loader.src = _loadModule.DATA_URL + '?callback=' + _loadModule.CALLBACK_NAME;
-      document.body.append(loader);
     }
   };
 })({

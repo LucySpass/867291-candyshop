@@ -1,7 +1,6 @@
 'use strict';
 
 var loadModule = (function () {
-  var CALLBACK_NAME = '__jsonpCallback';
   var DATA_URL = 'https://js.dump.academy/candyshop/data';
   var CANDY_SHOP_URL = 'https://js.dump.academy/candyshop';
   var HTTP_OK_CODE = 200;
@@ -12,7 +11,7 @@ var loadModule = (function () {
     xhr.responceType = 'json';
     xhr.addEventListener('load', function () {
       if (xhr.status === HTTP_OK_CODE) {
-        CALLBACK_NAME = onLoad(xhr.response);
+        onLoad(xhr.response);
       } else {
         onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
       }
@@ -39,7 +38,6 @@ var loadModule = (function () {
 
   return {
     contactServer: contactServer,
-    CALLBACK_NAME: CALLBACK_NAME,
     DATA_URL: DATA_URL
   };
 })();

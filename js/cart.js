@@ -218,7 +218,7 @@ var cartModule = (function () {
       paymentCardDate.addEventListener('keyup', keyupHandler);
 
       form.addEventListener('submit', function (evt) {
-        window.contactServer('POST', formPost, showError, new FormData(form));
+        window.loadModule.contactServer('POST', formPost, showError, new FormData(form));
         document.querySelectorAll('input').forEach(function (inputElement) {
           inputElement.value = inputElement.defaultValue;
         });
