@@ -4,12 +4,14 @@ var loadModule = (function () {
   var CALLBACK_NAME = '__jsonpCallback';
   var DATA_URL = 'https://js.dump.academy/candyshop/data';
   var CANDY_SHOP_URL = 'https://js.dump.academy/candyshop';
+  var HTTP_OK_CODE = 200;
+  var TIMEOUT = 10000;
 
-  function load(onLoad, onError) {
+  function contactServer(requestType, onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
     xhr.responceType = 'json';
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === HTTP_OK_CODE) {
         CALLBACK_NAME = onLoad(xhr.response);
       } else {
         onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
@@ -24,35 +26,19 @@ var loadModule = (function () {
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
 
-    xhr.timeout = 10000;
-
-    xhr.open('GET', DATA_URL, true);
-    xhr.send();
+    xhr.timeout = TIMEOUT;
+    if (requestType === 'GET') {
+      xhr.open('GET', DATA_URL, true);
+      xhr.send();
+    } else if (requestType === 'POST') {
+      xhr.open('POST', CANDY_SHOP_URL, true);
+      xhr.send(data);
+    }
   }
 
-  function upload(data, onLoad, onError) {
-    var xhr = new XMLHttpRequest();
-    xhr.responceType = 'json';
-    xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
-        onLoad(xhr.response);
-      } else {
-        onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
-      }
-    });
-    xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
-    });
-    xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
-    });
-    xhr.open('POST', CANDY_SHOP_URL, true);
-    xhr.send(data);
-  }
 
   return {
-    load: load,
-    upload: upload,
+    contactServer: contactServer,
     CALLBACK_NAME: CALLBACK_NAME,
     DATA_URL: DATA_URL
   };

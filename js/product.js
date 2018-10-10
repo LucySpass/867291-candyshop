@@ -6,6 +6,7 @@ var productModule = (function () {
   var SRC = 'img/cards/';
   var products = [];
   var errorDialog = document.querySelector('.modal--error');
+  var ESC_KEYCODE = 27;
 
   var VALUES = [
     'one', 'two', 'three', 'four', 'five'
@@ -14,7 +15,7 @@ var productModule = (function () {
   var catalogCardsElement = document.querySelector('.catalog__cards');
 
   function errorDialogClose(evt) {
-    if (evt.keyCode === 27) {
+    if (evt.keyCode === ESC_KEYCODE) {
       errorDialog.classList.add('modal--hidden');
       document.removeEventListener('keydown', errorDialogClose);
     }
