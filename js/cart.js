@@ -26,7 +26,7 @@ var cartModule = (function () {
   var paymentCardDate = form.querySelector('#payment__card-date');
 
   var errorDialog = document.querySelector('.modal--error');
-  var modalSuccess = document.querySelector('.modal--success');
+  var successDialog = document.querySelector('.modal--success');
 
   function hide(element) {
     element.classList.add('visually-hidden');
@@ -171,21 +171,18 @@ var cartModule = (function () {
     }
   }
 
-  function successModalKeydownHandler() {
-    modalSuccess.classList.add('modal--hidden');
-    document.removeEventListener('keydown', successModalKeydownHandler);
+  function formPost() {
+    var successDialogClose = successDialog.querySelector('.modal__close');
+    successDialog.classList.remove('modal--hidden');
+    successDialogClose.addEventListener('click', function () {
+      successDialog.classList.add('modal--hidden');
+    });
+    document.addEventListener('keydown', dialogClose);
   }
 
-  function formPost() {
-    var errorDialogCloseBtn = errorDialog.querySelector('.modal__close');
-    modalSuccess.classList.remove('modal--hidden');
-
-    errorDialogCloseBtn.addEventListener('click', function () {
-      modalSuccess.classList.add('modal--hidden');
-    });
-
-    document.addEventListener('keydown', successModalKeydownHandler);
-
+  function dialogClose() {
+    successDialog.classList.add('modal--hidden');
+    document.removeEventListener('keydown', dialogClose);
   }
 
   function showError(errorMessage) {
@@ -199,12 +196,7 @@ var cartModule = (function () {
       errorDialog.classList.add('modal--hidden');
     });
 
-    document.addEventListener('keydown', function modalKeydownHandler(evt) {
-      if (evt.keyCode === 27) {
-        errorDialog.classList.add('modal--hidden');
-        document.removeEventListener('keydown', modalKeydownHandler);
-      }
-    });
+    document.addEventListener('keydown', dialogClose);
   }
 
   return {
