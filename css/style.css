@@ -752,6 +752,7 @@ body {
   width: 22px;
   height: 22px;
   background-image: url("../img/cancel.svg");
+  cursor: pointer;
 }
 .card-order__close:hover,
 .card-order__close:focus {

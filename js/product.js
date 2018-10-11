@@ -114,8 +114,12 @@ var productModule = (function () {
 
     showError: showError,
 
-    applyFilters: function (/* data*/) {
-      // filters = data;
+    applyFilters: function (filters) {
+      filters.filter(function (filter) {
+        products.forEach(function (product) {
+          return product[filter];
+        });
+      });
     },
 
     addBtnClick: function (callback) {

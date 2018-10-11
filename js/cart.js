@@ -9,6 +9,7 @@ var cartModule = (function () {
   var deliverRadio = document.querySelector('.deliver__toggle');
   var cardNumberElement = document.querySelector('#payment__card-number');
   var paymentMethodRadio = document.querySelector('.payment');
+  var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
 
   var pickupForm = document.querySelector('.deliver__store');
   var deliverStoreId = 'deliver__store';
@@ -28,17 +29,9 @@ var cartModule = (function () {
   var errorDialog = document.querySelector('.modal--error');
   var successDialog = document.querySelector('.modal--success');
 
-  function hide(element) {
-    element.classList.add('visually-hidden');
-  }
-
-  function show(element) {
-    element.classList.remove('visually-hidden');
-  }
-
-  function contains(array, product) {
+  function contains(array, productName) {
     for (var i = 0; i < array.length; i++) {
-      if (array[i].name === product.name) {
+      if (array[i].name.toUpperCase() === productName.toUpperCase()) {
         return i;
       }
     }
@@ -63,8 +56,7 @@ var cartModule = (function () {
 
   function renderCartCards() {
     removeCart(productCardsElement);
-
-    if (cartProducts.length === 0) {
+    if (cartProducts.length === 0 || cartProducts === []) {
       productCardsElement.classList.add('goods__cards--empty');
       productCartEmpty.classList.remove('visually-hidden');
 
@@ -76,11 +68,10 @@ var cartModule = (function () {
     var amount = 0;
 
     for (var i = 0; i < cartProducts.length; i++) {
-      var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
       var cardOrderElement = cartCardTemplate.cloneNode(true);
       var cartProductAmountEl = cardOrderElement.querySelector('.card-order__count');
-
       var cartCard = createCartCard(cartProducts[i], cardOrderElement);
+
       cartProductAmountEl.value = cartProducts[i].cartAmount;
       cartProductAmountEl.name = cartProducts[i].name;
 
@@ -100,7 +91,7 @@ var cartModule = (function () {
       return;
     }
 
-    var index = contains(cartProducts, product);
+    var index = contains(cartProducts, product.name);
     if (index > -1) {
       cartProducts[index].cartAmount++;
     } else {
@@ -117,13 +108,13 @@ var cartModule = (function () {
     }
 
     if (event.target.id === deliverStoreId) {
-      show(pickupForm);
-      hide(courierForm);
+      toggleDisableForm(pickupForm, false);
+      toggleDisableForm(courierForm, true);
     }
 
     if (event.target.id === courierStoreId) {
-      show(courierForm);
-      hide(pickupForm);
+      toggleDisableForm(courierForm, false);
+      toggleDisableForm(pickupForm, true);
     }
   }
 
@@ -133,13 +124,13 @@ var cartModule = (function () {
     }
 
     if (event.target.id === cardId) {
-      show(cardForm);
-      hide(cashForm);
+      toggleDisableForm(cardForm, false);
+      toggleDisableForm(cashForm, true);
     }
 
     if (event.target.id === cashId) {
-      show(cashForm);
-      hide(cardForm);
+      toggleDisableForm(cashForm, false);
+      toggleDisableForm(cardForm, true);
     }
   }
 
@@ -199,6 +190,35 @@ var cartModule = (function () {
     document.addEventListener('keydown', dialogClose);
   }
 
+  function toggleDisableForm(formElement, bool) {
+    var blockInputs = formElement.querySelectorAll('input');
+
+    if (bool) {
+      formElement.classList.add('visually-hidden');
+    } else {
+      formElement.classList.remove('visually-hidden');
+    }
+
+    blockInputs.forEach(function (input, index) {
+      blockInputs[index].disabled = bool;
+    });
+  }
+
+  function changeAmount(increase, name) {
+    var index = contains(cartProducts, name);
+    if (index !== -1) {
+      if (increase) {
+        cartProducts[index].cartAmount++;
+      } else {
+        cartProducts[index].cartAmount--;
+        if (cartProducts[index].cartAmount === 0) {
+          cartProducts.splice(index, 1);
+        }
+      }
+      renderCartCards();
+    }
+  }
+
   return {
     addToCard: addToCard,
 
@@ -211,6 +231,27 @@ var cartModule = (function () {
     },
 
     onFormChange: function () {
+      var cartCardsWrap = document.querySelector('.goods__card-wrap');
+      cartCardsWrap.addEventListener('click', function (evt) {
+        if (evt.target.classList.contains('card-order__close')) {
+          var index = contains(cartProducts, evt.target.nextElementSibling.innerText);
+          if (index !== -1) {
+            cartProducts.splice(index, 1);
+            renderCartCards();
+          }
+        }
+      });
+
+      // var cartProductAmount = document.querySelector('.card-order__amount');
+      cartCardsWrap.addEventListener('click', function (evt) {
+        if (evt.target.classList.contains('card-order__btn--decrease')) {
+          changeAmount(false, evt.target.parentNode.parentNode.parentNode.childNodes[3].innerText);
+        }
+        if (evt.target.classList.contains('card-order__btn--increase')) {
+          changeAmount(true, evt.target.parentNode.parentNode.parentNode.childNodes[3].innerText);
+        }
+      });
+
       cardNumberElement.addEventListener('change', function (evt) {
         return isCorrect(evt.target.value) ? cardNumberElement.setCustomValidity('') : cardNumberElement.setCustomValidity('Invalid card');
       });
