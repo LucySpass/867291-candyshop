@@ -12,7 +12,7 @@ var initModule = (function (options) {
       _cartModule.onPaymentRadioChange();
       _cartModule.onFormChange();
 
-      _loadModule.contactServer('GET', _productModule.getProducts, _productModule.showError);
+      _loadModule.load(_productModule.getProducts, _productModule.showError);
 
       _productModule.addBtnClick(_cartModule.addToCard);
 
