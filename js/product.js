@@ -47,6 +47,10 @@ var productModule = (function () {
     var favoriteBtn = cardElement.querySelector('.card__btn-favorite');
     var addBtn = cardElement.querySelector('.card__btn');
 
+    if (product.favourite) {
+      favoriteBtn.classList.add('card__btn-favorite--selected');
+    }
+
     getAmountClass(cardTemplate, product.amount);
 
     cardElement.querySelector('.card__title').textContent = product.name;
@@ -97,6 +101,92 @@ var productModule = (function () {
     document.addEventListener('keydown', errorDialogClose);
   }
 
+  function renderCards(array) {
+    var fragment = document.createDocumentFragment();
+    for (var i = 0; i < array.length; i++) {
+      fragment.appendChild(renderCard(array[i]));
+    }
+    catalogCardsElement.appendChild(fragment);
+  }
+
+  function filterProducts(filters) {
+    catalogCardsElement.innerHTML = '';
+
+    var filteredProducts = products;
+    for (var i = 0; i < Object.keys(filters).length; i++) {
+      var filterName = Object.keys(filters)[i];
+
+      switch (filterName) {
+        case 'value':
+          if (filters[filterName].length > 0) {
+            filteredProducts = filteredProducts.filter(function (product) {
+              var flag = false;
+              filters[filterName].forEach(function (filter) {
+                flag = flag || product.kind === filter;
+              });
+              return flag;
+            });
+            continue;
+          }
+          break;
+        case 'bool':
+          if (filters[filterName].length > 0) {
+            filteredProducts = filteredProducts.filter(function (product) {
+              var flag = false;
+              filters[filterName].forEach(function (filter) {
+                if (filter.name === 'favourite') {
+                  flag = flag || product.favourite === filter.bool;
+                } else {
+                  flag = flag || product.nutritionFacts[filter.name] === filter.bool;
+                }
+              });
+              return flag;
+            });
+            continue;
+          }
+          break;
+        case 'more':
+          if (filters[filterName] !== '') {
+            filteredProducts = filteredProducts.filter(function (product) {
+              return product.amount > 0;
+            });
+            continue;
+          }
+          break;
+        case 'sort':
+          switch (filters[filterName]) {
+            case 'rating.number':
+              filteredProducts = filteredProducts.sort(function (a, b) {
+                return b.rating.number - a.rating.number;
+              });
+              break;
+            case 'priceDown':
+              filteredProducts = filteredProducts.sort(function (a, b) {
+                return b.price - a.price;
+              });
+              break;
+            case 'priceUp':
+              filteredProducts = filteredProducts.sort(function (a, b) {
+                return a.price - b.price;
+              });
+              break;
+            case 'rating.value':
+              filteredProducts = filteredProducts.sort(function (a, b) {
+                return b.rating.value - a.rating.value;
+              });
+              break;
+          }
+          continue;
+        case 'price':
+          filteredProducts = filteredProducts.filter(function (product) {
+            return product.price >= filters.price.min && product.price <= filters.price.max;
+          });
+          break;
+      }
+    }
+    renderCards(filteredProducts);
+  }
+
   return {
     getProducts: function (serverProducts) {
       var catalogLoad = document.querySelector('.catalog__load');
@@ -105,22 +195,16 @@ var productModule = (function () {
       catalogLoad.classList.add('visually-hidden');
 
       products = JSON.parse(serverProducts);
-      console.log(products);
       products.forEach(function (product) {
         product.picture = SRC + product.picture;
       });
-
-      var fragment = document.createDocumentFragment();
-      for (var i = 0; i < products.length; i++) {
-        fragment.appendChild(renderCard(products[i]));
-      }
-      catalogCardsElement.appendChild(fragment);
+      renderCards(products);
     },
 
     showError: showError,
 
-    applyFilters: function (data) {
-      console.log(data);
+    applyFilters: function (filters) {
+      filterProducts(filters);
       // filters = data;
     },
 

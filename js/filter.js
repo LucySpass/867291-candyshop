@@ -8,10 +8,15 @@ var filterModule = (function () {
   var sliderLine = document.querySelector('.range__filter');
   var sliderFillLine = document.querySelector('.range__fill-line');
 
-  var filters = [];
-  var minPrice = 0;
-  var maxPrice = 260;
-  // var filterCallback;
+  var filters = {
+    value: [],
+    bool: [],
+    more: '',
+    sort: '',
+    price: {min: 0, max: 0}
+  };
+  var minPrice = 60;
+  var maxPrice = 230;
 
   var min = parseInt(getComputedStyle(rangeMin).left, 10);
   var max = parseInt(getComputedStyle(rangeMax).left, 10);
@@ -19,6 +24,8 @@ var filterModule = (function () {
   var MAX = 245;
   var ELEMENT_WIDTH = 240;
   var sliderLineCoords = getCoords(sliderLine);
+
+  var filterCallback;
 
   function rangeMaxMouseDownHandler(evt) {
     var elMaxCoords = getCoords(rangeMax);
@@ -28,6 +35,11 @@ var filterModule = (function () {
     function rangeMaxMouseMoveHandler(e) {
       maxPrice = parseInt(max, 10);
       priceMax.textContent = maxPrice;
+
+      filters.price.min = minPrice;
+      filters.price.max = maxPrice;
+      filterCallback(filters);
+
       var newRight = e.pageX - shiftX - sliderLineCoords.left;
       if (newRight > MAX) {
         newRight = MAX;
@@ -57,6 +69,11 @@ var filterModule = (function () {
       minPrice = parseInt(min, 10);
       priceMin.textContent = minPrice;
 
+      filters.price.min = minPrice;
+      filters.price.max = maxPrice;
+
+      filterCallback(filters);
+
       var newLeft = e.pageX - shiftX - sliderLineCoords.left;
       if (newLeft < MIN) {
         newLeft = MIN;
@@ -85,8 +102,79 @@ var filterModule = (function () {
     };
   }
 
-  function checkForSort(sortName) {
+  function arrContains(array, value) {
+    var index = array.indexOf(value);
+    if (index > -1) {
+      array.splice(index, 1);
+      return;
+    }
+    array.push(value);
+  }
 
+  function filtersBoolContains(value, bool) {
+    if (filters.bool.length === 0) {
+      filters.bool.push({name: value, bool: bool});
+    } else {
+      for (var i = 0; i < filters.bool.length; i++) {
+        if (filters.bool[i].name === value) {
+          filters.bool.splice(i, 1);
+          return;
+        }
+      }
+      filters.bool.push({name: value, bool: bool});
+    }
+  }
+
+  function addFilterValue(value, array) {
+    arrContains(array, value);
+  }
+
+  function addFilterBool(value) {
+    switch (value) {
+      case 'Без сахара':
+        filtersBoolContains('sugar', false);
+        break;
+      case 'Безглютеновое':
+        filtersBoolContains('gluten', false);
+        break;
+      case 'Вегетарианское':
+        filtersBoolContains('vegetarian', true);
+        break;
+      case 'Только избранное':
+        filtersBoolContains('favourite', true);
+        break;
+      default:
+        break;
+    }
+  }
+
+  function addFilterMore(value) {
+    if (filters.more !== '') {
+      filters.more = '';
+    } else {
+      filters.more = value;
+    }
+  }
+
+  function addFilterSort(value) {
+    var name;
+    switch (value) {
+      case 'Сначала популярные':
+        name = 'rating.number';
+        break;
+      case 'Сначала дорогие':
+        name = 'priceDown';
+        break;
+      case 'Сначала дешёвые':
+        name = 'priceUp';
+        break;
+      case 'По рейтингу':
+        name = 'rating.value';
+        break;
+      default:
+        break;
+    }
+    filters.sort = name;
   }
 
   return {
@@ -95,47 +183,36 @@ var filterModule = (function () {
       rangeMax.addEventListener('mousedown', rangeMaxMouseDownHandler);
     },
     onFilterChange: function (callback) {
+      filterCallback = callback;
+
       var form = document.querySelector('form:nth-child(1)');
       form.addEventListener('change', function (evt) {
         var currFilter = evt.target.nextElementSibling.innerText;
-        console.log(currFilter);
-        console.log(evt.target.name);
-        console.log(evt.target.classList);
+        var currElementName = evt.target.name;
 
-        filters[0] = ({
-          price: {
-            minPrice: minPrice,
-            maxPrice: maxPrice
-          }
-        });
-        var currFilterIndex = filters.indexOf(currFilter);
+        filters.sort = 'rating.number';
 
-        switch (evt.target.name) {
+        switch (currElementName) {
           case 'food-type':
-            var
+            addFilterValue(currFilter, filters.value);
             break;
           case 'food-property':
+            addFilterBool(currFilter);
             break;
           case 'mark':
+            if (currFilter !== 'Только избранное') {
+              addFilterMore(currFilter);
+            } else {
+              addFilterBool(currFilter);
+            }
             break;
           case 'sort':
+            addFilterSort(currFilter);
             break;
           default:
             break;
         }
-
-
-        // var currFilterIndex = filters.indexOf(currFilter);
-
-        // if(evt.target.name === )
-
-        if (currFilterIndex > -1) {
-          filters.splice(currFilterIndex, 1);
-        } else {
-          filters.push(currFilter);
-        }
-
-        console.log(filters);
+        filterCallback(filters);
 
         /* evt.target.nextElementSibling.nextElementSibling.innerText = 'lala';
         [].forEach.call(form.children, function (elem) {
@@ -150,8 +227,6 @@ var filterModule = (function () {
         });*/
 
       });
-      callback('lallala');
-      // filterCallback = callback;
     }
   };
 })();
