@@ -16,11 +16,8 @@ var initModule = (function (options) {
 
       _productModule.addBtnClick(_cartModule.addToCard);
 
-      var filters = 'mock data';
       _filterModule.listenToPriceRadio();
-      _filterModule.onFilterChange(function () {
-        _productModule.applyFilters(filters);
-      });
+      _filterModule.onFilterChange(_productModule.applyFilters);
     }
   };
 })({
