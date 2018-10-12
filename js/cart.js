@@ -29,6 +29,9 @@ var cartModule = (function () {
   var errorDialog = document.querySelector('.modal--error');
   var successDialog = document.querySelector('.modal--success');
 
+  var deliverStoreList = document.querySelector('.deliver__store-list').querySelectorAll('input');
+  var deliverStoreMap = document.querySelector('.deliver__store-map-img');
+
   function contains(array, productName) {
     for (var i = 0; i < array.length; i++) {
       if (array[i].name.toUpperCase() === productName.toUpperCase()) {
@@ -219,6 +222,14 @@ var cartModule = (function () {
     }
   }
 
+  function deliverStoreChangeHandler() {
+    deliverStoreList.forEach(function (radio) {
+      if (radio.checked) {
+        deliverStoreMap.src = 'img/map/' + radio.value + '.jpg';
+      }
+    });
+  }
+
   return {
     addToCard: addToCard,
 
@@ -264,6 +275,10 @@ var cartModule = (function () {
           inputElement.value = inputElement.defaultValue;
         });
         evt.preventDefault();
+      });
+
+      document.querySelector('.deliver__store-list').querySelectorAll('input').forEach(function (el) {
+        el.addEventListener('change', deliverStoreChangeHandler);
       });
     }
   };

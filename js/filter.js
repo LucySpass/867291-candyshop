@@ -16,7 +16,7 @@ var filterModule = (function () {
     price: {min: 0, max: 0}
   };
   var minPrice = 0;
-  var maxPrice = 230;
+  var maxPrice = 245;
 
   var min = parseInt(getComputedStyle(rangeMin).left, 10);
   var max = parseInt(getComputedStyle(rangeMax).left, 10);
