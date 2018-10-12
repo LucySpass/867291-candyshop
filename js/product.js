@@ -109,6 +109,13 @@ var productModule = (function () {
     catalogCardsElement.appendChild(fragment);
   }
 
+  function showFilterError() {
+    var blockEmptyFilter = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter');
+    var emptyFilter = blockEmptyFilter.cloneNode(true);
+    var catalogCards = document.querySelector('.catalog__cards');
+    catalogCards.appendChild(emptyFilter);
+  }
+
   function filterProducts(filters) {
     catalogCardsElement.innerHTML = '';
 
@@ -185,6 +192,10 @@ var productModule = (function () {
       }
     }
     renderCards(filteredProducts);
+
+    if (filteredProducts === []) {
+      showFilterError();
+    }
   }
 
   return {

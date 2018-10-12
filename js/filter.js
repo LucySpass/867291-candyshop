@@ -7,14 +7,17 @@ var filterModule = (function () {
   var priceMax = document.querySelector('.range__price--max');
   var sliderLine = document.querySelector('.range__filter');
   var sliderFillLine = document.querySelector('.range__fill-line');
+  var showAllBtn = document.querySelector('.catalog__submit');
 
-  var filters = {
+  var initFilters = {
     value: [],
     bool: [],
     more: '',
     sort: '',
-    price: {min: 0, max: 0}
+    price: {min: 0, max: 245}
   };
+
+  var filters = initFilters;
   var minPrice = 0;
   var maxPrice = 245;
 
@@ -184,6 +187,11 @@ var filterModule = (function () {
     },
     onFilterChange: function (callback) {
       filterCallback = callback;
+
+      showAllBtn.addEventListener('click', function () {
+        filters = initFilters;
+        filterCallback(filters);
+      });
 
       var form = document.querySelector('form:nth-child(1)');
       form.addEventListener('change', function (evt) {
