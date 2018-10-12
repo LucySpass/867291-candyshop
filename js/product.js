@@ -68,13 +68,17 @@ var productModule = (function () {
     cardElement.querySelector('.card__composition-list').textContent = product.nutritionFacts.contents;
 
     favoriteBtn.addEventListener('click', function () {
-      return favoriteBtn.classList.contains('card__btn-favorite--selected') ?
-        favoriteBtn.classList.remove('card__btn-favorite--selected') :
+      product.favourite = !favoriteBtn.classList.contains('card__btn-favorite--selected');
+
+      if (favoriteBtn.classList.contains('card__btn-favorite--selected')) {
+        favoriteBtn.classList.remove('card__btn-favorite--selected');
+      } else {
         favoriteBtn.classList.add('card__btn-favorite--selected');
+      }
+      renderCard(product);
     });
 
     addBtn.dataset.cartproductname = product.name;
-
     return cardElement;
   }
 
@@ -101,6 +105,7 @@ var productModule = (function () {
       catalogLoad.classList.add('visually-hidden');
 
       products = JSON.parse(serverProducts);
+      console.log(products);
       products.forEach(function (product) {
         product.picture = SRC + product.picture;
       });
@@ -114,12 +119,9 @@ var productModule = (function () {
 
     showError: showError,
 
-    applyFilters: function (filters) {
-      filters.filter(function (filter) {
-        products.forEach(function (product) {
-          return product[filter];
-        });
-      });
+    applyFilters: function (data) {
+      console.log(data);
+      // filters = data;
     },
 
     addBtnClick: function (callback) {

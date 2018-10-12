@@ -12,15 +12,12 @@ var initModule = (function (options) {
       _cartModule.onPaymentRadioChange();
       _cartModule.onFormChange();
 
-      _loadModule.contactServer('GET', _productModule.getProducts, _productModule.showError);
+      _loadModule.load(_productModule.getProducts, _productModule.showError);
 
       _productModule.addBtnClick(_cartModule.addToCard);
 
-      var filters = 'mock data';
       _filterModule.listenToPriceRadio();
-      _filterModule.onFilterChange(function () {
-        _productModule.applyFilters(filters);
-      });
+      _filterModule.onFilterChange(_productModule.applyFilters);
     }
   };
 })({
