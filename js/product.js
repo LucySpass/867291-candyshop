@@ -21,8 +21,6 @@ var productModule = (function () {
     }
   }
 
-  // var filters;
-
   function getAmountClass(element, amount) {
     if (amount < AMOUNT_MIDDLE) {
       element.classList.remove('card--in-stock');
@@ -30,14 +28,14 @@ var productModule = (function () {
     }
   }
 
-  var getRating = function (element, good) {
+  function getRating(element, good) {
     var ratingElem = element.querySelector('.stars__rating');
 
     if (good.rating.value !== RATING_NUMBER) {
       ratingElem.classList.remove('stars__rating--five');
       ratingElem.classList.add('stars__rating--' + VALUES[good.rating.value]);
     }
-  };
+  }
 
   function renderCard(product) {
     var cardTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
@@ -101,10 +99,10 @@ var productModule = (function () {
     document.addEventListener('keydown', errorDialogClose);
   }
 
-  function renderCards(array) {
+  function renderCards(cards) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < array.length; i++) {
-      fragment.appendChild(renderCard(array[i]));
+    for (var i = 0; i < cards.length; i++) {
+      fragment.appendChild(renderCard(cards[i]));
     }
     catalogCardsElement.appendChild(fragment);
   }
@@ -112,8 +110,7 @@ var productModule = (function () {
   function showFilterError() {
     var blockEmptyFilter = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter');
     var emptyFilter = blockEmptyFilter.cloneNode(true);
-    var catalogCards = document.querySelector('.catalog__cards');
-    catalogCards.appendChild(emptyFilter);
+    catalogCardsElement.appendChild(emptyFilter);
   }
 
   function filterProducts(filters) {
@@ -193,7 +190,7 @@ var productModule = (function () {
     }
     renderCards(filteredProducts);
 
-    if (filteredProducts === []) {
+    if (filteredProducts === [] || filteredProducts.length === 0) {
       showFilterError();
     }
   }
@@ -216,19 +213,18 @@ var productModule = (function () {
 
     applyFilters: function (filters) {
       filterProducts(filters);
-      // filters = data;
     },
 
     addBtnClick: function (callback) {
       catalogCardsElement.addEventListener('click', function (event) {
         if (event.target.classList.contains('card__btn')) {
-          var productArray = products.filter(function (product) {
+          var additionProduct = products.filter(function (product) {
             if (product.name === event.target.dataset.cartproductname) {
               return product;
             }
             return null;
           });
-          callback(productArray[0]);
+          callback(additionProduct[0]);
         }
       });
     }

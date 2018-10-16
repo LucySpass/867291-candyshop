@@ -342,6 +342,7 @@ body {
   background-color: transparent;
   text-decoration: underline;
   color: #6e58d9;
+  cursor: pointer;
 }
 .catalog__submit:hover {
   text-shadow: #6e58d9 1px 0 0;

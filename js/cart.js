@@ -1,6 +1,10 @@
 'use strict';
 
 var cartModule = (function () {
+  var DECIMAL = 10;
+  var LUHN_CHECK_NUMBER = 10;
+  var LUHN_MINUS_NUMBER = 9;
+
   var cartProducts = [];
   var cartFragment = document.createDocumentFragment();
   var productCardsElement = document.querySelector('.goods__cards');
@@ -12,7 +16,7 @@ var cartModule = (function () {
   var cartCardTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
 
   var pickupForm = document.querySelector('.deliver__store');
-  var deliverStoreId = 'deliver__store';
+  var pickupStoreId = 'deliver__store';
 
   var courierForm = document.querySelector('.deliver__courier');
   var courierStoreId = 'deliver__courier';
@@ -23,6 +27,8 @@ var cartModule = (function () {
   var cashForm = document.querySelector('.payment__cash-wrap');
   var cashId = 'payment__cash';
 
+  var contactDataForm = document.querySelector('.contact-data__inner');
+
   var form = document.querySelector('form:nth-child(2)');
   var paymentCardDate = form.querySelector('#payment__card-date');
 
@@ -32,9 +38,9 @@ var cartModule = (function () {
   var deliverStoreList = document.querySelector('.deliver__store-list').querySelectorAll('input');
   var deliverStoreMap = document.querySelector('.deliver__store-map-img');
 
-  function contains(array, productName) {
-    for (var i = 0; i < array.length; i++) {
-      if (array[i].name.toUpperCase() === productName.toUpperCase()) {
+  function contains(elements, productName) {
+    for (var i = 0; i < elements.length; i++) {
+      if (elements[i].name.toUpperCase() === productName.toUpperCase()) {
         return i;
       }
     }
@@ -58,17 +64,22 @@ var cartModule = (function () {
   }
 
   function renderCartCards() {
+    var sum = 0;
+    var amount = 0;
+
     removeCart(productCardsElement);
     if (cartProducts.length === 0 || cartProducts === []) {
       productCardsElement.classList.add('goods__cards--empty');
+
+      productCardsElement.appendChild(productCartEmpty);
       productCartEmpty.classList.remove('visually-hidden');
 
       cartLabel.textContent = 'В корзине ничего нет';
+
+      disableAllCheckoutForms(true);
       return;
     }
-
-    var sum = 0;
-    var amount = 0;
+    disableAllCheckoutForms(false);
 
     for (var i = 0; i < cartProducts.length; i++) {
       var cardOrderElement = cartCardTemplate.cloneNode(true);
@@ -106,58 +117,58 @@ var cartModule = (function () {
   }
 
   function deliverRadioToggle(event) {
-    if (!event.target.id) {
+    if (!event.target.id || cartProducts.length === 0 || cartProducts === []) {
       return;
     }
 
-    if (event.target.id === deliverStoreId) {
-      toggleDisableForm(pickupForm, false);
-      toggleDisableForm(courierForm, true);
+    if (event.target.id === pickupStoreId) {
+      toggleFormVisibility(pickupForm, false);
+      toggleFormVisibility(courierForm, true);
     }
 
     if (event.target.id === courierStoreId) {
-      toggleDisableForm(courierForm, false);
-      toggleDisableForm(pickupForm, true);
+      toggleFormVisibility(courierForm, false);
+      toggleFormVisibility(pickupForm, true);
     }
   }
 
   function paymentRadioToggle(event) {
-    if (!event.target.id) {
+    if (!event.target.id || cartProducts.length === 0 || cartProducts === []) {
       return;
     }
 
     if (event.target.id === cardId) {
-      toggleDisableForm(cardForm, false);
-      toggleDisableForm(cashForm, true);
+      toggleFormVisibility(cardForm, false);
+      toggleFormVisibility(cashForm, true);
     }
 
     if (event.target.id === cashId) {
-      toggleDisableForm(cashForm, false);
-      toggleDisableForm(cardForm, true);
+      toggleFormVisibility(cashForm, false);
+      toggleFormVisibility(cardForm, true);
     }
   }
 
   function isCorrect(cardNumber) {
-    var arr = cardNumber.split('').map(function (num, index) {
-      var digit = parseInt(num, 10);
+    var cardNumbers = cardNumber.split('').map(function (num, index) {
+      var digit = parseInt(num, DECIMAL);
 
       if ((index + cardNumber.length) % 2 === 0) {
         var digitX2 = digit * 2;
 
-        return digitX2 > 9 ? digitX2 - 9 : digitX2;
+        return digitX2 > LUHN_MINUS_NUMBER ? digitX2 - LUHN_MINUS_NUMBER : digitX2;
       }
 
       return digit;
     });
 
-    var result = arr.reduce(function (previousValue, currentValue) {
+    var result = cardNumbers.reduce(function (previousValue, currentValue) {
       return previousValue + currentValue;
     });
 
-    return (result >= 10 && result % 10 === 0);
+    return (result >= LUHN_CHECK_NUMBER && result % LUHN_CHECK_NUMBER === 0);
   }
 
-  function keyupHandler(evt) {
+  function keyUpHandler(evt) {
     if (evt.keyCode !== 8) {
       if (paymentCardDate.value.length === 2) {
         paymentCardDate.value += '/';
@@ -193,14 +204,18 @@ var cartModule = (function () {
     document.addEventListener('keydown', dialogClose);
   }
 
-  function toggleDisableForm(formElement, bool) {
-    var blockInputs = formElement.querySelectorAll('input');
+  function toggleFormVisibility(formElement, bool) {
+    toggleFormDisability(formElement, !bool);
 
     if (bool) {
       formElement.classList.add('visually-hidden');
     } else {
       formElement.classList.remove('visually-hidden');
     }
+  }
+
+  function toggleFormDisability(formElement, bool) {
+    var blockInputs = formElement.querySelectorAll('input');
 
     blockInputs.forEach(function (input, index) {
       blockInputs[index].disabled = bool;
@@ -230,6 +245,14 @@ var cartModule = (function () {
     });
   }
 
+  function disableAllCheckoutForms(bool) {
+    toggleFormDisability(courierForm, bool);
+    toggleFormDisability(cashForm, bool);
+    toggleFormDisability(pickupForm, bool);
+    toggleFormDisability(cardForm, bool);
+    toggleFormDisability(contactDataForm, bool);
+  }
+
   return {
     addToCard: addToCard,
 
@@ -242,6 +265,8 @@ var cartModule = (function () {
     },
 
     onFormChange: function () {
+      disableAllCheckoutForms(true);
+
       var cartCardsWrap = document.querySelector('.goods__card-wrap');
       cartCardsWrap.addEventListener('click', function (evt) {
         if (evt.target.classList.contains('card-order__close')) {
@@ -253,7 +278,6 @@ var cartModule = (function () {
         }
       });
 
-      // var cartProductAmount = document.querySelector('.card-order__amount');
       cartCardsWrap.addEventListener('click', function (evt) {
         if (evt.target.classList.contains('card-order__btn--decrease')) {
           changeAmount(false, evt.target.parentNode.parentNode.parentNode.childNodes[3].innerText);
@@ -267,7 +291,7 @@ var cartModule = (function () {
         return isCorrect(evt.target.value) ? cardNumberElement.setCustomValidity('') : cardNumberElement.setCustomValidity('Invalid card');
       });
 
-      paymentCardDate.addEventListener('keyup', keyupHandler);
+      paymentCardDate.addEventListener('keyup', keyUpHandler);
 
       form.addEventListener('submit', function (evt) {
         window.loadModule.upload(new FormData(form), formPost, showError);

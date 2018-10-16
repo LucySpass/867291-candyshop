@@ -13,11 +13,11 @@ var filterModule = (function () {
     value: [],
     bool: [],
     more: '',
-    sort: '',
+    sort: 'rating.number',
     price: {min: 0, max: 245}
   };
 
-  var filters = initFilters;
+  var filters = JSON.parse(JSON.stringify(initFilters));
   var minPrice = 0;
   var maxPrice = 245;
 
@@ -26,13 +26,12 @@ var filterModule = (function () {
   var MIN = 0;
   var MAX = 245;
   var ELEMENT_WIDTH = 240;
-  var sliderLineCoords = getCoords(sliderLine);
+  var sliderLineCoordinates = getCoordinates(sliderLine);
 
   var filterCallback;
 
   function rangeMaxMouseDownHandler(evt) {
-    var elMaxCoords = getCoords(rangeMax);
-    var shiftX = evt.pageX - elMaxCoords.left;
+    var shiftX = evt.pageX - getCoordinates(rangeMax).left;
     document.addEventListener('mousemove', rangeMaxMouseMoveHandler);
 
     function rangeMaxMouseMoveHandler(e) {
@@ -43,7 +42,7 @@ var filterModule = (function () {
       filters.price.max = maxPrice;
       filterCallback(filters);
 
-      var newRight = e.pageX - shiftX - sliderLineCoords.left;
+      var newRight = e.pageX - shiftX - sliderLineCoordinates.left;
       if (newRight > MAX) {
         newRight = MAX;
       }
@@ -64,8 +63,7 @@ var filterModule = (function () {
   }
 
   function rangeMinMouseDownHandler(evt) {
-    var elMinCoords = getCoords(rangeMin);
-    var shiftX = evt.pageX - elMinCoords.left;
+    var shiftX = evt.pageX - getCoordinates(rangeMin).left;
     document.addEventListener('mousemove', rangeMinMouseMoveHandler);
 
     function rangeMinMouseMoveHandler(e) {
@@ -77,7 +75,7 @@ var filterModule = (function () {
 
       filterCallback(filters);
 
-      var newLeft = e.pageX - shiftX - sliderLineCoords.left;
+      var newLeft = e.pageX - shiftX - sliderLineCoordinates.left;
       if (newLeft < MIN) {
         newLeft = MIN;
       }
@@ -97,11 +95,11 @@ var filterModule = (function () {
     document.addEventListener('mouseup', rangeMinMouseUpHandler);
   }
 
-  function getCoords(elem) {
-    var elCoords = elem.getBoundingClientRect();
+  function getCoordinates(elem) {
+    var coordinatesElement = elem.getBoundingClientRect();
     return {
-      top: elCoords.top + pageYOffset,
-      left: elCoords.left + pageXOffset
+      top: coordinatesElement.top + pageYOffset,
+      left: coordinatesElement.left + pageXOffset
     };
   }
 
@@ -180,25 +178,36 @@ var filterModule = (function () {
     filters.sort = name;
   }
 
+  function resetFilters(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    filters = JSON.parse(JSON.stringify(initFilters));
+    filterCallback(filters);
+  }
+
+  function resetCheckbox() {
+    var inputCheckbox = document.querySelectorAll('.input-btn__input--checkbox');
+    inputCheckbox.forEach(function (checkbox) {
+      checkbox.checked = false;
+    });
+  }
+
+
   return {
     listenToPriceRadio: function () {
       rangeMin.addEventListener('mousedown', rangeMinMouseDownHandler);
       rangeMax.addEventListener('mousedown', rangeMaxMouseDownHandler);
     },
+
     onFilterChange: function (callback) {
-      filterCallback = callback;
-
-      showAllBtn.addEventListener('click', function () {
-        filters = initFilters;
-        filterCallback(filters);
-      });
-
       var form = document.querySelector('form:nth-child(1)');
+
+      filterCallback = callback;
+      showAllBtn.addEventListener('click', resetFilters);
+
       form.addEventListener('change', function (evt) {
         var currFilter = evt.target.nextElementSibling.innerText;
         var currElementName = evt.target.name;
-
-        filters.sort = 'rating.number';
 
         switch (currElementName) {
           case 'food-type':
@@ -208,6 +217,8 @@ var filterModule = (function () {
             addFilterBool(currFilter);
             break;
           case 'mark':
+            filters = JSON.parse(JSON.stringify(initFilters));
+            resetCheckbox();
             if (currFilter !== 'Только избранное') {
               addFilterMore(currFilter);
             } else {
@@ -221,19 +232,6 @@ var filterModule = (function () {
             break;
         }
         filterCallback(filters);
-
-        /* evt.target.nextElementSibling.nextElementSibling.innerText = 'lala';
-        [].forEach.call(form.children, function (elem) {
-          if (elem.classList.contains('catalog__filter')) {
-            console.log(elem);
-            console.log(elem.querySelector('.input-btn__item-count'));
-            var itemsCount = elem.querySelector('.input-btn__item-count');
-            if (itemsCount !== null) {
-              callback()
-            }
-          }
-        });*/
-
       });
     }
   };
