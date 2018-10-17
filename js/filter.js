@@ -1,6 +1,16 @@
 'use strict';
 
 var filterModule = (function () {
+  var MIN = 0;
+  var MAX = 245;
+  var ELEMENT_WIDTH = 240;
+  var DECIMAL = 10;
+  var MIDDLE_DIVISION_NUMBER = 2;
+  var NOT_FOUND_INDEX_NUMBER = -1;
+
+  var minPrice = MIN;
+  var maxPrice = MAX;
+
   var rangeMin = document.querySelector('.range__btn--left');
   var rangeMax = document.querySelector('.range__btn--right');
   var priceMin = document.querySelector('.range__price--min');
@@ -9,25 +19,23 @@ var filterModule = (function () {
   var sliderFillLine = document.querySelector('.range__fill-line');
   var showAllBtn = document.querySelector('.catalog__submit');
 
+  var form = document.querySelector('form:nth-child(1)');
+  var sortingRadioButtons = form.querySelectorAll('.input-btn__input--radio');
+
   var initFilters = {
     value: [],
     bool: [],
     more: '',
     sort: 'rating.number',
-    price: {min: 0, max: 245}
+    price: {min: MIN, max: MAX}
   };
 
   var filters = JSON.parse(JSON.stringify(initFilters));
-  var minPrice = 0;
-  var maxPrice = 245;
 
-  var min = parseInt(getComputedStyle(rangeMin).left, 10);
-  var max = parseInt(getComputedStyle(rangeMax).left, 10);
-  var MIN = 0;
-  var MAX = 245;
-  var ELEMENT_WIDTH = 240;
+  var min = parseInt(getComputedStyle(rangeMin).left, DECIMAL);
+  var max = parseInt(getComputedStyle(rangeMax).left, DECIMAL);
+
   var sliderLineCoordinates = getCoordinates(sliderLine);
-
   var filterCallback;
 
   function rangeMaxMouseDownHandler(evt) {
@@ -35,7 +43,7 @@ var filterModule = (function () {
     document.addEventListener('mousemove', rangeMaxMouseMoveHandler);
 
     function rangeMaxMouseMoveHandler(e) {
-      maxPrice = parseInt(max, 10);
+      maxPrice = parseInt(max, DECIMAL);
       priceMax.textContent = maxPrice;
 
       filters.price.min = minPrice;
@@ -46,8 +54,8 @@ var filterModule = (function () {
       if (newRight > MAX) {
         newRight = MAX;
       }
-      if (newRight < min + rangeMin.offsetWidth / 2) {
-        newRight = min + rangeMin.offsetWidth / 2;
+      if (newRight < min + rangeMin.offsetWidth / MIDDLE_DIVISION_NUMBER) {
+        newRight = min + rangeMin.offsetWidth / MIDDLE_DIVISION_NUMBER;
       }
       max = newRight;
       rangeMax.style.left = newRight + 'px';
@@ -67,7 +75,7 @@ var filterModule = (function () {
     document.addEventListener('mousemove', rangeMinMouseMoveHandler);
 
     function rangeMinMouseMoveHandler(e) {
-      minPrice = parseInt(min, 10);
+      minPrice = parseInt(min, DECIMAL);
       priceMin.textContent = minPrice;
 
       filters.price.min = minPrice;
@@ -79,8 +87,8 @@ var filterModule = (function () {
       if (newLeft < MIN) {
         newLeft = MIN;
       }
-      if (newLeft > max - rangeMax.offsetWidth / 2) {
-        newLeft = max - rangeMax.offsetWidth / 2;
+      if (newLeft > max - rangeMax.offsetWidth / MIDDLE_DIVISION_NUMBER) {
+        newLeft = max - rangeMax.offsetWidth / MIDDLE_DIVISION_NUMBER;
       }
       min = newLeft;
       rangeMin.style.left = newLeft + 'px';
@@ -105,7 +113,7 @@ var filterModule = (function () {
 
   function arrContains(array, value) {
     var index = array.indexOf(value);
-    if (index > -1) {
+    if (index > NOT_FOUND_INDEX_NUMBER) {
       array.splice(index, 1);
       return;
     }
@@ -181,7 +189,11 @@ var filterModule = (function () {
   function resetFilters(evt) {
     evt.stopPropagation();
     evt.preventDefault();
+
     filters = JSON.parse(JSON.stringify(initFilters));
+    resetCheckbox();
+    sortingRadioButtons[0].checked = true;
+
     filterCallback(filters);
   }
 
@@ -192,16 +204,14 @@ var filterModule = (function () {
     });
   }
 
-
   return {
     listenToPriceRadio: function () {
       rangeMin.addEventListener('mousedown', rangeMinMouseDownHandler);
       rangeMax.addEventListener('mousedown', rangeMaxMouseDownHandler);
+
     },
 
     onFilterChange: function (callback) {
-      var form = document.querySelector('form:nth-child(1)');
-
       filterCallback = callback;
       showAllBtn.addEventListener('click', resetFilters);
 

@@ -4,6 +4,10 @@ var cartModule = (function () {
   var DECIMAL = 10;
   var LUHN_CHECK_NUMBER = 10;
   var LUHN_MINUS_NUMBER = 9;
+  var LUHN_TIMES_NUMBER = 2;
+  var BACKSPACE = 8;
+  var MONTHS_NUMBER = 2;
+  var EVEN_NUMBER_CHECK = 2;
 
   var cartProducts = [];
   var cartFragment = document.createDocumentFragment();
@@ -152,8 +156,8 @@ var cartModule = (function () {
     var cardNumbers = cardNumber.split('').map(function (num, index) {
       var digit = parseInt(num, DECIMAL);
 
-      if ((index + cardNumber.length) % 2 === 0) {
-        var digitX2 = digit * 2;
+      if ((index + cardNumber.length) % EVEN_NUMBER_CHECK === 0) {
+        var digitX2 = digit * LUHN_TIMES_NUMBER;
 
         return digitX2 > LUHN_MINUS_NUMBER ? digitX2 - LUHN_MINUS_NUMBER : digitX2;
       }
@@ -169,8 +173,8 @@ var cartModule = (function () {
   }
 
   function keyUpHandler(evt) {
-    if (evt.keyCode !== 8) {
-      if (paymentCardDate.value.length === 2) {
+    if (evt.keyCode !== BACKSPACE) {
+      if (paymentCardDate.value.length === MONTHS_NUMBER) {
         paymentCardDate.value += '/';
       }
     }

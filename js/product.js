@@ -4,13 +4,14 @@ var productModule = (function () {
   var RATING_NUMBER = 5;
   var AMOUNT_MIDDLE = 5;
   var SRC = 'img/cards/';
-  var products = [];
-  var errorDialog = document.querySelector('.modal--error');
   var ESC_KEYCODE = 27;
-
+  var WEIGHT_CHILD_NODE_NUMBER = 2;
   var VALUES = [
     'one', 'two', 'three', 'four', 'five'
   ];
+
+  var products = [];
+  var errorDialog = document.querySelector('.modal--error');
 
   var catalogCardsElement = document.querySelector('.catalog__cards');
 
@@ -57,7 +58,7 @@ var productModule = (function () {
     picture.alt = product.name;
 
     price.childNodes[0].textContent = product.price + ' ';
-    price.childNodes[2].textContent = '/ ' + product.weight + ' Г';
+    price.childNodes[WEIGHT_CHILD_NODE_NUMBER].textContent = '/ ' + product.weight + ' Г';
 
     getRating(cardElement, product);
 
