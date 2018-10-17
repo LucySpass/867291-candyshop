@@ -186,6 +186,20 @@ var filterModule = (function () {
     filters.sort = name;
   }
 
+  function resetPrice() {
+    minPrice = MIN;
+    maxPrice = MAX;
+
+    rangeMin.style.left = MIN + 'px';
+    sliderFillLine.style.left = MIN + 'px';
+
+    rangeMax.style.left = MAX + 'px';
+    sliderFillLine.style.right = ELEMENT_WIDTH - MAX + 'px';
+
+    priceMax.textContent = maxPrice;
+    priceMin.textContent = minPrice;
+  }
+
   function resetFilters(evt) {
     evt.stopPropagation();
     evt.preventDefault();
@@ -193,6 +207,8 @@ var filterModule = (function () {
     filters = JSON.parse(JSON.stringify(initFilters));
     resetCheckbox();
     sortingRadioButtons[0].checked = true;
+
+    resetPrice();
 
     filterCallback(filters);
   }
@@ -208,7 +224,6 @@ var filterModule = (function () {
     listenToPriceRadio: function () {
       rangeMin.addEventListener('mousedown', rangeMinMouseDownHandler);
       rangeMax.addEventListener('mousedown', rangeMaxMouseDownHandler);
-
     },
 
     onFilterChange: function (callback) {
@@ -229,6 +244,7 @@ var filterModule = (function () {
           case 'mark':
             filters = JSON.parse(JSON.stringify(initFilters));
             resetCheckbox();
+            resetPrice();
             if (currFilter !== 'Только избранное') {
               addFilterMore(currFilter);
             } else {
